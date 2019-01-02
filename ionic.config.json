@@ -1,0 +1,8 @@
+{
+  "name": "ionic-travis",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "ionic-angular",
+  "pro_id": "a5bf3700"
+}

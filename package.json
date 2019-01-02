@@ -25,6 +25,7 @@
     "@ionic-native/status-bar": "~4.18.0",
     "@ionic/pro": "2.0.4",
     "@ionic/storage": "2.2.0",
+    "cordova-plugin-ionic": "5.2.9",
     "ionic-angular": "3.9.2",
     "ionicons": "3.0.0",
     "rxjs": "5.5.11",
@@ -35,5 +36,14 @@
     "@ionic/app-scripts": "3.2.1",
     "typescript": "~2.6.2"
   },
-  "description": "An Ionic project"
+  "description": "An Ionic project",
+  "cordova": {
+    "plugins": {
+      "cordova-plugin-ionic": {
+        "APP_ID": "ab5bf3700",
+        "CHANNEL_NAME": "Master",
+        "UPDATE_METHOD": "background"
+      }
+    }
+  }
 }

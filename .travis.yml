@@ -1,24 +1,85 @@
-dist: trusty
-sudo: false
-
-notifications:
-  email: 
-    recipients:
-      - $EMAIL_NOTIFICATION
-    on_success: always
-
 language: node_js
 node_js:
   - '8'
 
-addons:
+notifications:
+  email: 
+    recipients:
+      - brunodutrafranco@id.uff.br
+    on_success: always
+
+matrix:
+  include:
+  - os: linux
+    sudo: false
+    language: android
+    android:
+      components:
+      - tools
+      - platform-tools
+      - tools
+      - build-tools-26.0.0
+      - android-25
+      - extra-google-google_play_services
+      - extra-google-m2repository
+      - extra-android-m2repository
+    addons:
+      apt:
+        sources:
+        - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
+          key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
+        - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
+          key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
+        packages:
+          - oracle-java8-installer
+          - oracle-java8-set-default
+          - yarn
+          - jq
+          - gradle
+          - google-chrome-stable
+    
+    licenses:
+      - android-sdk-preview-license-.+
+      - android-sdk-license-.+
+      - google-gdk-license-.+
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
+  - rm -rf $HOME/.gradle/caches/3.5/fileHashes/
+  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
 
 cache:
   directories:
+    - "$HOME/.gradle/caches/"
+    - "$HOME/.gradle/wrapper/"
     - ./node_modules
+
+before-install: 
+  - export LANG=pt_BR.UTF-8
+  - export CHROME_BIN=google-chrome
+  - export TRAVIS_TAG=$(git tag --points-at HEAD)
+  - yarn global add ionic cordova
+  - mkdir -p $ANDROID_HOME/licenses
+  - echo -e "d56f5187479451eabf01fb78af6dfcb131a6481e" >> $ANDROID_HOME/licenses/android-sdk-license
+  - echo -e "84831b9409646a918e30573bab4c9c91346d8abd" >> $ANDROID_HOME/licenses/android-sdk-preview-license
 
 install:
   - npm install
 
 script:
   - ./travis/build.sh
+
+deploy:
+  provider: releases
+  github-token: $GITHUB_TOKEN
+  file_glob: true
+  file: "/home/travis/build/$TRAVIS_REPO_SLUG/platforms/android/app/build/outputs/apk/*/*.apk"
+  skip_cleanup: true
+  on:
+    repo: $TRAVIS_REPO_SLUG
+    all_branches: true
+    tags: true
+env:
+  global:
+  - JAVA_HOME=/usr/lib/jvm/java-8-oracle

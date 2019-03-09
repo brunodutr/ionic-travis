@@ -7,8 +7,8 @@ npm run lint
 if [[ "$TRAVIS_BRANCH" == "prod" ]]
 then
     echo "Build APK para Produção"
-    npm run build-prod
+    ionic cordova run android --prod --release
 else
     echo "Build APK para Desenvolvimento"
-    npm run build
+    ionic cordova run android
 fi

@@ -10,7 +10,7 @@ then
     ionic cordova build android --prod
     git checkout -- .
     export VERSION=$(npm version patch)
-    export TRAVIS_TAG="v${$VERSION}"
+    export TRAVIS_TAG="v${VERSION}"
 else
     echo "Build APK para Desenvolvimento"
     ionic cordova build android

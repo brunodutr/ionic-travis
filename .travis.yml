@@ -43,18 +43,6 @@ matrix:
           - gradle
           - google-chrome-stable
   
-before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
-  - rm -rf $HOME/.gradle/caches/3.5/fileHashes/
-  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
-
-cache:
-  directories:
-    - "$HOME/.gradle/caches/"
-    - "$HOME/.gradle/wrapper/"
-    - ./node_modules
-
 before_install: 
   - export LANG=pt_BR.UTF-8
   - export CHROME_BIN=google-chrome
@@ -68,7 +56,20 @@ install:
 script:
   - ./travis/build.sh
 
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
+  - rm -rf $HOME/.gradle/caches/3.5/fileHashes/
+  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - "$HOME/.gradle/caches/"
+    - "$HOME/.gradle/wrapper/"
+    - ./node_modules
+  
 before_deploy:
+  - echo "Deploying IonicTravis to GitHub"
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
   - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
@@ -76,13 +77,14 @@ before_deploy:
 
 deploy:
   provider: releases
-  api_key: $GITHUB_TOKEN
+  api_key: 
+    secure: $GITHUB_TOKEN
   file_glob: true
   file: "/home/travis/build/$TRAVIS_REPO_SLUG/platforms/android/app/build/outputs/apk/*/*.apk"
   skip_cleanup: true
   on:
     repo: $TRAVIS_REPO_SLUG
-    branch: prod
+    all_branches: true
     tags: true
 
 env:

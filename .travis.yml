@@ -2,8 +2,9 @@ dist: trusty
 sudo: false
 
 notifications:
-  email: $EMAIL_NOTIFICATION
-  slack:
+  email: 
+    recipients:
+      - $EMAIL_NOTIFICATION
     on_success: always
 
 language: node_js
@@ -20,6 +21,4 @@ install:
   - npm install
 
 script:
-  - npm run clean
-  - npm run lint
-  - npm run build
+  - ./travis/build-android.sh

@@ -58,7 +58,6 @@ cache:
 before_install: 
   - export LANG=pt_BR.UTF-8
   - export CHROME_BIN=google-chrome
-  - export TRAVIS_TAG=$(git tag --points-at HEAD)
   - nvm install 9
   - yarn global add ionic cordova
   - yes | sdkmanager "platforms;android-27"  
@@ -69,16 +68,23 @@ install:
 script:
   - ./travis/build.sh
 
+before_deploy:
+  - git config --local user.name $GITHUB_USERNAME
+  - git config --local user.email $GITHUB_EMAIL
+  - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
+  - git tag $TRAVIS_TAG
+
 deploy:
   provider: releases
-  github-token: $GITHUB_TOKEN
+  api_key: $GITHUB_TOKEN
   file_glob: true
   file: "/home/travis/build/$TRAVIS_REPO_SLUG/platforms/android/app/build/outputs/apk/*/*.apk"
   skip_cleanup: true
   on:
     repo: $TRAVIS_REPO_SLUG
-    all_branches: true
+    branch: prod
     tags: true
+
 env:
   global:
   - JAVA_HOME=/usr/lib/jvm/java-8-oracle

@@ -55,6 +55,11 @@ install:
 
 script:
   - ./travis/build.sh
+  - echo "Deploying IonicTravis to GitHub"
+  - git config --local user.name $GITHUB_USERNAME
+  - git config --local user.email $GITHUB_EMAIL
+  - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
+  - git tag $TRAVIS_TAG
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -68,13 +73,6 @@ cache:
     - "$HOME/.gradle/wrapper/"
     - ./node_modules
   
-before_deploy:
-  - echo "Deploying IonicTravis to GitHub"
-  - git config --local user.name $GITHUB_USERNAME
-  - git config --local user.email $GITHUB_EMAIL
-  - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
-  - git tag $TRAVIS_TAG
-
 deploy:
   provider: releases
   api_key: 

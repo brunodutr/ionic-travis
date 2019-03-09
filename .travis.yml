@@ -3,6 +3,8 @@ sudo: false
 
 notifications:
   email: $EMAIL_NOTIFICATION
+  slack:
+    on_success: always
 
 language: node_js
 node_js:

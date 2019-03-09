@@ -58,7 +58,7 @@ before_install:
   - yarn global add ionic cordova
   - yes | sdkmanager "platforms;android-27"  
 
-  install:
+install:
   - npm install
 
 script:

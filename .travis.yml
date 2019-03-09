@@ -58,7 +58,7 @@ script:
   - echo "Deploying IonicTravis to GitHub"
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
-  - echo $TRAVIS_TAG
+  - echo "$TRAVIS_TAG"
   - git tag $TRAVIS_TAG
 
 before_cache:

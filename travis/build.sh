@@ -7,7 +7,7 @@ npm run lint
 if [[ "$TRAVIS_BRANCH" == "prod" ]]
 then
     echo "Build APK para Produção"
-    ionic cordova build android --prod --release
+    ionic cordova build android --prod
     export VERSION = $(npm version patch)
     export TRAVIS_TAG= $('V' + $VERSION)
 else

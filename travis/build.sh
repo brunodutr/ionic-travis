@@ -8,11 +8,12 @@ if [[ "$TRAVIS_BRANCH" == "prod" ]]
 then
     echo "Build APK para Produção"
     ionic cordova build android --prod
+    git add . && git commit
     export VERSION=$(npm version patch)
-    export TRAVIS_TAG=("V${$VERSION}")
+    export TRAVIS_TAG=V${$VERSION}
 else
     echo "Build APK para Desenvolvimento"
     ionic cordova build android
     export VERSION=$(node -p -e "require('./package.json').version")
-    export TRAVIS_TAG=("V${VERSION}-SNAPSHOT")
+    export TRAVIS_TAG=V${VERSION}-SNAPSHOT
 fi

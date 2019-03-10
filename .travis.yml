@@ -51,7 +51,7 @@ install:
 script:
   - ./travis/build.sh
   - echo "Deploying IonicTravis to GitHub"
-  - export TRAVIS_TAG=${TRAVIS_TAG:-${VERSION}}
+  - export TRAVIS_TAG=${TRAVIS_TAG:-$VERSION $(date +'%Y/%m/%d %H:%M:%S')}
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
   - echo $TRAVIS_TAG

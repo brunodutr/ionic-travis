@@ -46,6 +46,7 @@ matrix:
 before_install: 
   - export LANG=pt_BR.UTF-8
   - export CHROME_BIN=google-chrome
+  - export SNAPSHOT=${TRAVIS_BRANCH} != "prod"
   - nvm install 9
   - yarn global add ionic cordova
   - yes | sdkmanager "platforms;android-27"  
@@ -84,6 +85,8 @@ deploy:
     secure: $GITHUB_TOKEN
   file_glob: true
   file: "/home/travis/build/$TRAVIS_REPO_SLUG/platforms/android/app/build/outputs/apk/*/*.apk"
+  prerelease: $SNAPSHOT
+  overwrite: $SNAPSHOT
   skip_cleanup: true
   on:
     repo: $TRAVIS_REPO_SLUG

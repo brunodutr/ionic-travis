@@ -1,8 +1,8 @@
 {
   "name": "ionic-travis",
   "version": "0.0.7",
-  "author": "Ionic Framework",
-  "homepage": "http://ionicframework.com/",
+  "author": "Bruno Dutra",
+  "homepage": "https://github.com/brunodutr",
   "private": true,
   "scripts": {
     "start": "ionic-app-scripts serve",
@@ -46,7 +46,7 @@
     "@ionic/app-scripts": "3.2.1",
     "typescript": "~2.6.2"
   },
-  "description": "An Ionic project",
+  "description": "Projeto no Ionic para automatizar o build",
   "cordova": {
     "plugins": {
       "cordova-plugin-ionic": {

@@ -57,7 +57,7 @@ script:
   - ./travis/build.sh
   - echo "Deploying IonicTravis to GitHub"
   - export VERSION=$(node -p -e "require('./package.json').version")
-  - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then git status && git checkout -- . && npm version patch && git status ; fi
+  - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then ./travis/release.sh ; fi
   - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then export VERSION=${VERSION}-SNAPSHOT ; fi
   - echo $VERSION
   - export TRAVIS_TAG=${TRAVIS_TAG:-${VERSION}}

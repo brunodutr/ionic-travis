@@ -44,12 +44,12 @@ matrix:
           - google-chrome-stable
   
 before_install: 
+  - nvm install 9
   - export LANG=pt_BR.UTF-8
   - export CHROME_BIN=google-chrome
   - export VERSION=$(node -p -e "require('./package.json').version")
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
-  - nvm install 9
   - yarn global add ionic cordova
   - yes | sdkmanager "platforms;android-27"  
 

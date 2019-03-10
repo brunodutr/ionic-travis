@@ -58,8 +58,8 @@ script:
   - echo "Deploying IonicTravis to GitHub"
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
-  - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then export VERSION=$(npm version patch)
-  - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then export VERSION=$(node -p -e "require('./package.json').version")-SNAPSHOT
+  - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then export VERSION=$(npm version patch) fi
+  - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then export VERSION=$(node -p -e "require('./package.json').version")-SNAPSHOT fi
   - export TRAVIS_TAG=${TRAVIS_TAG:-$(v${VERSION})}
   - echo $TRAVIS_TAG
   - git tag $TRAVIS_TAG

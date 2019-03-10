@@ -87,6 +87,7 @@ deploy:
   prerelease: $SNAPSHOT
   overwrite: $SNAPSHOT
   skip_cleanup: true
+  target_commitish: $TRAVIS_COMMIT
   on:
     repo: $TRAVIS_REPO_SLUG
     all_branches: true

@@ -11,6 +11,7 @@ then
     export VERSION=$(npm version patch)
 else
     echo "Build APK para Desenvolvimento"
-    ionic cordova build android
     export VERSION=$(node -p -e "require('./package.json').version")-SNAPSHOT
+    echo $VERSION
+    ionic cordova build android
 fi

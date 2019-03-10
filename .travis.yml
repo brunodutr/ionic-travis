@@ -64,8 +64,7 @@ script:
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
   - echo $TRAVIS_TAG
-  - git tag --delete $TRAVIS_TAG
-  - git tag $TRAVIS_TAG
+  - git tag -f $TRAVIS_TAG
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock

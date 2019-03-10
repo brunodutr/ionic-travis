@@ -46,7 +46,8 @@ matrix:
 before_install: 
   - export LANG=pt_BR.UTF-8
   - export CHROME_BIN=google-chrome
-  - export SNAPSHOT=${TRAVIS_BRANCH} != "prod"
+  - export SNAPSHOT=$($TRAVIS_BRANCH != "prod")
+  - echo $SNAPSHOT
   - nvm install 9
   - yarn global add ionic cordova
   - yes | sdkmanager "platforms;android-27"  

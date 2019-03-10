@@ -1,18 +1,15 @@
 branches:
   only:
-    - master
-    - prod
-
+  - master
+  - prod
 language: node_js
 node_js:
-  - '8'
-
+- '8'
 notifications:
-  email: 
+  email:
     recipients:
-      - brunodutrafranco@id.uff.br
+    - brunodutrafranco@id.uff.br
     on_success: always
-
 matrix:
   include:
   - os: linux
@@ -20,14 +17,14 @@ matrix:
     language: android
     android:
       components:
-        - build-tools-27.0.3
-        - android-27
-        - add-on
-        - extra
+      - build-tools-27.0.3
+      - android-27
+      - add-on
+      - extra
       licenses:
-        - 'android-sdk-preview-license-52d11cd2'
-        - 'android-sdk-license-.+'
-        - 'google-gdk-license-.+'
+      - android-sdk-preview-license-52d11cd2
+      - android-sdk-license-.+
+      - google-gdk-license-.+
     addons:
       apt:
         sources:
@@ -36,67 +33,67 @@ matrix:
         - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
           key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
         packages:
-          - oracle-java8-installer
-          - oracle-java8-set-default
-          - yarn
-          - jq
-          - gradle
-          - google-chrome-stable
-  
-before_install: 
-  - nvm install 9
-  - export LANG=pt_BR.UTF-8
-  - export CHROME_BIN=google-chrome
-  - export VERSION=$(node -p -e "require('./package.json').version")
-  - git config --local user.name $GITHUB_USERNAME
-  - git config --local user.email $GITHUB_EMAIL
-  - yarn global add ionic cordova
-  - yes | sdkmanager "platforms;android-27"  
-
+        - oracle-java8-installer
+        - oracle-java8-set-default
+        - yarn
+        - jq
+        - gradle
+        - google-chrome-stable
+before_install:
+- openssl aes-256-cbc -K $encrypted_be66c6f932df_key -iv $encrypted_be66c6f932df_iv
+  -in ionictravis.keystore.enc -out ionictravis.keystore -d
+- nvm install 9
+- export LANG=pt_BR.UTF-8
+- export CHROME_BIN=google-chrome
+- export VERSION=$(node -p -e "require('./package.json').version")
+- git config --local user.name $GITHUB_USERNAME
+- git config --local user.email $GITHUB_EMAIL
+- yarn global add ionic cordova
+- yes | sdkmanager "platforms;android-27"
 install:
-  - npm install
-
+- npm install
 script:
-  - ./travis/build.sh
-  - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then ./travis/release.sh && export SNAPSHOT=false; fi
-  - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then export VERSION=${VERSION}-SNAPSHOT && export SNAPSHOT=true ; fi
-
+- "./travis/build.sh"
+- if [[ "$TRAVIS_BRANCH" == "prod" ]]; then ./travis/release.sh && export SNAPSHOT=false;
+  fi
+- if [[ "$TRAVIS_BRANCH" != "prod" ]]; then export VERSION=${VERSION}-SNAPSHOT &&
+  export SNAPSHOT=true ; fi
 before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
-  - rm -rf $HOME/.gradle/caches/3.5/fileHashes/
-  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
-
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
+- rm -rf $HOME/.gradle/caches/3.5/fileHashes/
+- rm -rf $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-    - "$HOME/.gradle/caches/"
-    - "$HOME/.gradle/wrapper/"
-    - ./node_modules
-
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+  - "./node_modules"
 before_deploy:
-  - echo "Deploying IonicTravis to GitHub"
-  - ln -s /home/travis/build/$TRAVIS_REPO_SLUG/platforms/android/app/build/outputs/apk/*/*.apk ionictravis-${VERSION}.apk
-  - git tag -f v${VERSION}
-  - git remote add travis https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}
-  - git push travis :v${VERSION} || true
-  - git push -f travis v${VERSION}
-  - git remote remove travis
-
+- echo "Deploying IonicTravis to GitHub"
+- ln -s /home/travis/build/$TRAVIS_REPO_SLUG/platforms/android/app/build/outputs/apk/*/*.apk
+  ionictravis-${VERSION}.apk
+- git tag -f v${VERSION}
+- git remote add travis https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}
+- git push travis :v${VERSION} || true
+- git push -f travis v${VERSION}
+- git remote remove travis
 deploy:
   provider: releases
-  api_key: 
-    secure: $GITHUB_TOKEN
+  api_key:
+    secure: "$GITHUB_TOKEN"
   file_glob: true
   file: ionictravis-${VERSION}.apk
-  prerelease: $SNAPSHOT
-  overwrite: $SNAPSHOT
+  prerelease: "$SNAPSHOT"
+  overwrite: "$SNAPSHOT"
   skip_cleanup: true
-  target_commitish: $TRAVIS_COMMIT
+  target_commitish: "$TRAVIS_COMMIT"
   on:
-    repo: $TRAVIS_REPO_SLUG
+    repo: "$TRAVIS_REPO_SLUG"
     all_branches: true
     tags: false
-
 env:
   global:
   - JAVA_HOME=/usr/lib/jvm/java-8-oracle
+dd:
+- openssl aes-256-cbc -K $encrypted_be66c6f932df_key -iv $encrypted_be66c6f932df_iv
+  -in ionictravis.keystore.enc -out ionictravis.keystore -d

@@ -75,7 +75,7 @@ cache:
 
 before_deploy:
   - echo "Deploying IonicTravis to GitHub"
-  - ln -s "/home/travis/build/$TRAVIS_REPO_SLUG/platforms/android/app/build/outputs/apk/*/*.apk" ionictravis-${VERSION}.apk
+  - ln -s /home/travis/build/$TRAVIS_REPO_SLUG/platforms/android/app/build/outputs/apk/*/*.apk ionictravis-${VERSION}.apk
   - git tag -f v${VERSION}
   - git remote add travis https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}
   - git push travis :v${VERSION} || true
@@ -87,7 +87,7 @@ deploy:
   api_key: 
     secure: $GITHUB_TOKEN
   file_glob: true
-  file: "/home/travis/build/$TRAVIS_REPO_SLUG/platforms/android/app/build/outputs/apk/*/*.apk"
+  file: ionictravis-${VERSION}.apk
   prerelease: $SNAPSHOT
   overwrite: $SNAPSHOT
   skip_cleanup: true

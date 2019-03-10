@@ -8,7 +8,6 @@ if [[ "$TRAVIS_BRANCH" == "prod" ]]
 then
     echo "Build APK para Produção"
     ionic cordova build android --prod --release
-    git checkout -- .
     export VERSION=$(npm version patch)
 else
     echo "Build APK para Desenvolvimento"

@@ -54,7 +54,7 @@ install:
 - npm install
 script:
 - "./travis/build.sh"
-- if [[ "$TRAVIS_BRANCH" == "prod" ]]; then ./travis/release.sh && export SNAPSHOT=false;
+- if [[ "$TRAVIS_BRANCH" == "prod" ]]; then export SNAPSHOT=false;
   fi
 - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then export VERSION=${VERSION}-SNAPSHOT &&
   export SNAPSHOT=true ; fi
@@ -91,6 +91,10 @@ deploy:
     repo: "$TRAVIS_REPO_SLUG"
     all_branches: true
     tags: false
+
+after_sucess:
+  - ./travis/release.sh
+
 env:
   global:
   - JAVA_HOME=/usr/lib/jvm/java-8-oracle

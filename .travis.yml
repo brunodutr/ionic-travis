@@ -46,6 +46,9 @@ matrix:
 before_install: 
   - export LANG=pt_BR.UTF-8
   - export CHROME_BIN=google-chrome
+  - export VERSION=$(node -p -e "require('./package.json').version")
+  - git config --local user.name $GITHUB_USERNAME
+  - git config --local user.email $GITHUB_EMAIL
   - nvm install 9
   - yarn global add ionic cordova
   - yes | sdkmanager "platforms;android-27"  
@@ -55,13 +58,8 @@ install:
 
 script:
   - ./travis/build.sh
-  - echo "Deploying IonicTravis to GitHub"
-  - git config --local user.name $GITHUB_USERNAME
-  - git config --local user.email $GITHUB_EMAIL
-  - export VERSION=$(node -p -e "require('./package.json').version")
   - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then ./travis/release.sh && export SNAPSHOT=false; fi
   - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then export VERSION=${VERSION}-SNAPSHOT && export SNAPSHOT=true ; fi
-  - git tag -f "v${VERSION}"
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -74,7 +72,16 @@ cache:
     - "$HOME/.gradle/caches/"
     - "$HOME/.gradle/wrapper/"
     - ./node_modules
-  
+
+before_deploy:
+  - echo "Deploying IonicTravis to GitHub"
+  - ln -s "/home/travis/build/$TRAVIS_REPO_SLUG/platforms/android/app/build/outputs/apk/*/*.apk" ionictravis-${VERSION}.apk
+  - git tag -f v${VERSION}
+  - git remote add travis https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}
+  - git push travis :v${VERSION} || true
+  - git push -f travis v${VERSION}
+  - git remote remove travis
+
 deploy:
   provider: releases
   api_key: 

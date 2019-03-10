@@ -51,8 +51,10 @@ install:
 script:
   - ./travis/build.sh
   - echo "Deploying IonicTravis to GitHub"
+  - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then export VERSION=$(npm version patch) ; fi
+  - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then export VERSION=$(node -p -e "require('./package.json').version")-SNAPSHOT ; fi
   - echo $VERSION
-  - export TRAVIS_TAG=${TRAVIS_TAG:-${VERSION}_$(date +'%Y/%m/%d_%H:%M:%S')}
+  - export TRAVIS_TAG=${TRAVIS_TAG:-${VERSION}_$(date +'%Y/%m/%d_%H-%M-%S')}
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
   - echo $TRAVIS_TAG

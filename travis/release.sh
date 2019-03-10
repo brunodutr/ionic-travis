@@ -2,7 +2,7 @@ set -e
 
 if [[ "$TRAVIS_BRANCH" == "prod" ]]
 then
-
+    echo "Versionamento o aplicativo"
     npm version patch --no-git-tag-version
 
     git checkout master

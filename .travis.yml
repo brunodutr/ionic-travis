@@ -49,23 +49,24 @@ before_install:
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
 
+  - nvm install 11
   - npm install -g ionic cordova
 
 install:
   - npm install
 
 script:
-  - './travis/build.sh'
+  - ./travis/build.sh
 
-  - './travis/sign.sh'
+  - ./travis/sign.sh
 
   - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then
-    export SNAPSHOT=false;
+      export SNAPSHOT=false;
     fi
 
   - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then
-    export VERSION=${VERSION}-SNAPSHOT &&
-    export SNAPSHOT=true ;
+      export VERSION=${VERSION}-SNAPSHOT &&
+      export SNAPSHOT=true ;
     fi
 
 before_cache:

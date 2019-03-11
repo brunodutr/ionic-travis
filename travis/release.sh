@@ -1,9 +1,10 @@
 set -e 
 
-echo "BRANCH: $TRAVIS_BRANCH | RELEASE"
 
 if [[ "$TRAVIS_BRANCH" == "prod" ]]
 then
+
+    echo "BRANCH: $TRAVIS_BRANCH | RELEASE"
 
     rm ionictravis-${VERSION}.apk
     

@@ -14,7 +14,7 @@ branches:
     - prod
 
 language: node_js
-node_js: '9'
+node_js: 'node'
 
 notifications:
   email:
@@ -48,8 +48,6 @@ before_install:
 
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
-
-  - nvm install node
 
   - npm install -g ionic cordova
 

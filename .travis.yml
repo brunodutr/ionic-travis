@@ -41,14 +41,16 @@ matrix:
             - google-chrome-stable
             - gradle
             - jq
-            - npm
             - oracle-java8-installer
             - oracle-java8-set-default
 before_install:
+  
   - export VERSION=$(node -p -e "require('./package.json').version")
 
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
+  
+  - nvm install 9
 
   - npm install -g ionic cordova
 

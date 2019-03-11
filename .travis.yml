@@ -28,8 +28,12 @@ matrix:
       language: android
       android:
         components:
-          - build-tools-${VERSION-BUILD-TOOLS}
-          - android-${VERSION-ANDROID}
+          - build-tools-28.0.3
+          - android-28
+        licenses:
+          - android-sdk-preview-license-52d11cd2
+          - android-sdk-license-.+
+          - google-gdk-license-.+
       addons:
         apt:
           sources:
@@ -46,9 +50,9 @@ matrix:
 before_install:
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
-  
+
   - nvm install 11
-  
+
   - npm install -g ionic cordova
 
   - export VERSION=$(node -p -e "require('./package.json').version")
@@ -62,12 +66,12 @@ script:
   - ./travis/sign.sh
 
   - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then
-      export SNAPSHOT=false;
+    export SNAPSHOT=false;
     fi
 
   - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then
-      export VERSION=${VERSION}-SNAPSHOT &&
-      export SNAPSHOT=true ;
+    export VERSION=${VERSION}-SNAPSHOT &&
+    export SNAPSHOT=true ;
     fi
 
 before_cache:

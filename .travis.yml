@@ -44,13 +44,14 @@ matrix:
             - oracle-java8-installer
             - oracle-java8-set-default
 before_install:
-  - export VERSION=$(node -p -e "require('./package.json').version")
-
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
-
+  
   - nvm install 11
+  
   - npm install -g ionic cordova
+
+  - export VERSION=$(node -p -e "require('./package.json').version")
 
 install:
   - npm install

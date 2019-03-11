@@ -44,7 +44,6 @@ matrix:
             - npm
             - oracle-java8-installer
             - oracle-java8-set-default
-            - yarn
 before_install:
   - export VERSION=$(node -p -e "require('./package.json').version")
 

@@ -14,7 +14,7 @@ branches:
     - prod
 
 language: node_js
-node_js: 'node'
+node_js: '11'
 
 notifications:
   email:

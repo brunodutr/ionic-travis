@@ -48,7 +48,7 @@ matrix:
             - oracle-java8-installer
             - oracle-java8-set-default
         sonarcloud:
-          organization: 'sonarcloud'
+          organization: 'brunodutr-github'
           token:
             secure: $SONAR_TOKEN
 
@@ -67,10 +67,6 @@ install:
 
 script:
 
-  - ./travis/build.sh
-
-  - ./travis/sign.sh
-
   - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then
     export SNAPSHOT=false;
     fi
@@ -81,6 +77,10 @@ script:
     fi
 
   - sonar-scanner -X -Dsonar.projectVersion=${VERSION}
+
+  - ./travis/build.sh
+
+  - ./travis/sign.sh
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock

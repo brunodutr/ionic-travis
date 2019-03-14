@@ -76,12 +76,12 @@ script:
     export SNAPSHOT=true ;
     fi
 
-  - sonar-scanner -X -Dsonar.projectVersion=${VERSION}
-
   - ./travis/build.sh
 
   - ./travis/sign.sh
 
+  - sonar-scanner -X -Dsonar.projectVersion=${VERSION}
+  
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock

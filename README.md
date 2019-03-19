@@ -1,22 +1,19 @@
 # About
 
-* Working on it!
+Working on it!
 
 # How to use
 
-* Working on it!
+Working on it!
 
 # Team
 
 * [Bruno Dutra](https://github.com/brunodutr/) 
-* [Flavio Luiz Seixas] (http://lattes.cnpq.br/4319951805195534)
-
-# Documentation
-
-* Working on it!
+* [Flavio Luiz Seixas](http://lattes.cnpq.br/4319951805195534)
 
 # Development
 
+* [Documentation](https://github.com/brunodutr/ionic-travis/wiki)
 * [Source Code](https://github.com/brunodutr/ionic-travis)
 * [Issue Tracking](https://github.com/brunodutr/ionic-travis/issues)
 

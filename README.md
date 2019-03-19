@@ -1,4 +1,4 @@
-# About
+# Ionic Travis [![Build Status](https://travis-ci.com/brunodutr/ionic-travis.svg?branch=master)](https://travis-ci.com/brunodutr/ionic-travis) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=IonicTravis&metric=alert_status)](https://sonarcloud.io/dashboard?id=IonicTravis) 
 
 Working on it!
 
@@ -14,15 +14,16 @@ Working on it!
 # Development
 
 * [Documentation](https://github.com/brunodutr/ionic-travis/wiki)
-* [Source Code](https://github.com/brunodutr/ionic-travis)
 * [Issue Tracking](https://github.com/brunodutr/ionic-travis/issues)
+* [Releases](https://github.com/brunodutr/ionic-travis/releases)
+* [Source Code](https://github.com/brunodutr/ionic-travis)
 
 # Technologies
 
 * [Angular](https://angular.io/)
 * [Ionic](https://ionicframework.com/)
-* [Sonar Cloud](https://sonarcloud.io) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=IonicTravis&metric=alert_status)](https://sonarcloud.io/dashboard?id=IonicTravis)
-* [Travis CI](https://travis-ci.com/) [![Build Status](https://travis-ci.com/brunodutr/ionic-travis.svg?branch=master)](https://travis-ci.com/brunodutr/ionic-travis)
+* [Sonar Cloud](https://sonarcloud.io) 
+* [Travis CI](https://travis-ci.com/) 
 
 # Acknowledgements
 

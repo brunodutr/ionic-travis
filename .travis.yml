@@ -106,6 +106,7 @@ deploy:
   file: ionictravis-${VERSION}.apk
   prerelease: '$SNAPSHOT'
   overwrite: '$SNAPSHOT'
+  name: 'v${VERSION}'
   skip_cleanup: true
   on:
     repo: '$TRAVIS_REPO_SLUG'

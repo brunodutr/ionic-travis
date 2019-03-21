@@ -1,5 +1,8 @@
 dist: trusty
 
+language: node_js
+node_js: '11'
+
 env:
   global:
     - JAVA_HOME=/usr/lib/jvm/java-8-oracle
@@ -13,41 +16,11 @@ branches:
     - master
     - prod
 
-language: node_js
-node_js: '11'
-
 notifications:
   email:
-    recipients:
-      - brunodutrafranco@id.uff.br
-
-matrix:
-  include:
-    - os: linux
-      sudo: false
-      language: android
-      android:
-        components:
-          - build-tools-27.0.3
-          - android-27
-        licenses:
-          - android-sdk-preview-.+
-          - android-sdk-license-.+
-          - google-gdk-license-.+
-      addons:
-        apt:
-          sources:
-            - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
-              key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
-            - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
-              key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
-          packages:
-            - google-chrome-beta
-            - gradle
-            - jq
-            - oracle-java8-installer
-            - oracle-java8-set-default
-
+    on_success: never
+    on_failure: change
+        
 before_install:
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
@@ -70,6 +43,7 @@ jobs:
   include:
     - name: 'Define Version'
       stage: 'Version'
+      install: skip
       script:
         - export VERSION=$(node -p -e "require('./package.json').version")
         - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then export SNAPSHOT=false; fi
@@ -82,18 +56,28 @@ jobs:
 
     - name: 'e2e Tests'
       stage: 'Tests'
+      addons: 
+        sources:
+            - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
+              key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
+          packages:
+            - google-chrome-stable
+          update: true
       script:
+        - google-chrome --version
         - npm install -g webdriver-manager
         - webdriver-manager update --standalone false --gecko false --versions.chrome 2.35
         - ng e2e --protractor-config=./e2e/protractor-ci.conf.js --webdriver-update=false
 
     - name: 'Lint'
       stage: 'Code Analisys'
+      install: skip
       script:
         - npm run lint
 
     - name: 'Sonar'
       stage: 'Code Analisys'
+      install: skip
       addons:
         sonarcloud:
           organization: 'brunodutr-github'
@@ -103,15 +87,39 @@ jobs:
         - sonar-scanner -Dsonar.projectVersion=${VERSION}
 
     - stage: 'Build'
+      os: linux
+        sudo: false
+        language: android
+        android:
+          components:
+            - build-tools-27.0.3
+            - android-27
+          licenses:
+            - android-sdk-preview-.+
+            - android-sdk-license-.+
+            - google-gdk-license-.+
+        addons:
+          apt:
+            sources:
+              - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
+                key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
+            packages:
+              - gradle
+              - jq
+              - oracle-java8-installer
+              - oracle-java8-set-default
+
       script:
         - ionic cordova build android --prod --release
 
     - stage: 'Sign Apk'
+      install: skip
       script:
         - ./travis/sign.sh
       if: branch IN (master, prod)
 
     - stage: 'Deploy'
+      install: skip
       script:
         - ./travis/before_deploy.sh
       deploy:
@@ -130,6 +138,7 @@ jobs:
           tags: false
 
     - stage: 'Release'
+      install: skip
       script:
         - ./travis/release.sh
       if: branch = prod

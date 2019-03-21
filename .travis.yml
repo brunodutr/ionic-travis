@@ -66,11 +66,8 @@ jobs:
   include:
     - name: 'Environment Install'
       stage: Config
-      install: skip
       script:
         - npm install -g ionic cordova
-        - npm install
-        - npm ci
 
     - name: 'Define Version'
       install: skip
@@ -81,13 +78,11 @@ jobs:
         - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then export VERSION=${VERSION}-SNAPSHOT && export SNAPSHOT=true ;fi
 
     - name: 'Unit Tests'
-      install: skip
       stage: 'Tests'
       script:
         - ng test --watch=false --progress=false --browsers=ChromeHeadlessCI ----code-coverage
 
     - name: 'e2e Tests'
-      install: skip
       stage: 'Tests'
       addons:
         sources:

@@ -47,10 +47,6 @@ matrix:
             - jq
             - oracle-java8-installer
             - oracle-java8-set-default
-        sonarcloud:
-          organization: 'brunodutr-github'
-          token:
-            secure: $SONAR_TOKEN
 
 before_install:
   - git config --local user.name $GITHUB_USERNAME
@@ -98,6 +94,11 @@ jobs:
 
     - name: 'Sonar'
       stage: 'Code Analisys'
+      addons:
+        sonarcloud:
+          organization: 'brunodutr-github'
+          token:
+            secure: $SONAR_TOKEN
       script:
         - sonar-scanner -Dsonar.projectVersion=${VERSION}
 

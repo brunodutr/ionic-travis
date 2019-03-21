@@ -35,14 +35,12 @@ matrix:
           - android-sdk-license-.+
           - google-gdk-license-.+
       addons:
+        chrome: stable
         apt:
           sources:
             - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
               key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
-            - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
-              key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
           packages:
-            - google-chrome-stable
             - gradle
             - jq
             - oracle-java8-installer

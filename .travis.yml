@@ -49,11 +49,8 @@ before_install:
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
 
-install:
-  - npm install -g ionic cordova
-  - npm install
-
 stages:
+  - Config
   - Version
   - Tests
   - Code Analisys
@@ -61,15 +58,20 @@ stages:
   - Sign Apk
   - Deploy
   - Release
+  - Cache Dependencies
+
+fast_finish: true
 
 jobs:
   include:
+    - name: 'Environment Install'
+      stage: Config
+      script:
+        - npm install -g ionic cordova
+        - npm install
+
     - name: 'Define Version'
       stage: 'Version'
-      before_cache: skip
-      cache: skip
-      install: skip
-      fast_finish: true
       script:
         - export VERSION=$(node -p -e "require('./package.json').version")
         - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then export SNAPSHOT=false; fi
@@ -96,13 +98,11 @@ jobs:
         - ng e2e --protractor-config=./e2e/protractor-ci.conf.js --webdriver-update=false
 
     - name: 'Lint'
-      install: skip
       stage: 'Code Analisys'
       script:
         - npm run lint
 
     - name: 'Sonar'
-      install: skip
       stage: 'Code Analisys'
       addons:
         sonarcloud:
@@ -140,13 +140,11 @@ jobs:
         - ionic cordova build android --prod --release
 
     - stage: 'Sign Apk'
-      install: skip
       script:
         - ./travis/sign.sh
       if: branch IN (master, prod)
 
     - stage: 'Deploy'
-      install: skip
       script:
         - ./travis/before_deploy.sh
       deploy:
@@ -165,21 +163,20 @@ jobs:
           tags: false
 
     - stage: 'Release'
-      install: skip
       script:
         - ./travis/release.sh
       if: branch = prod
 
-before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
-  - rm -rf $HOME/.gradle/caches/3.5/fileHashes/
-  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
-
-cache:
-  npm: true
-  directories:
-    - '$HOME/.gradle/caches/'
-    - '$HOME/.gradle/wrapper/'
-    - '$HOME/.sonar/cache'
-    - './node_modules'
+    - stage: 'Cache Dependencies'
+      before_cache:
+        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+        - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
+        - rm -rf $HOME/.gradle/caches/3.5/fileHashes/
+        - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
+      cache:
+        npm: true
+        directories:
+          - '$HOME/.gradle/caches/'
+          - '$HOME/.gradle/wrapper/'
+          - '$HOME/.sonar/cache'
+          - './node_modules'

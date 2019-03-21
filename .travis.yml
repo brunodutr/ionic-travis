@@ -66,8 +66,7 @@ jobs:
   include:
     - name: 'Define Version'
       stage: 'Version'
-      install: true
-      script: 
+      script:
         - export VERSION=$(node -p -e "require('./package.json').version")
         - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then export SNAPSHOT=false; fi
         - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then export VERSION=${VERSION}-SNAPSHOT && export SNAPSHOT=true ;fi
@@ -79,13 +78,13 @@ jobs:
 
     - name: 'e2e Tests'
       stage: 'Tests'
-      addons: 
+      addons:
         sources:
-            - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
-              key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
-          packages:
-            - google-chrome-stable
-          update: true
+          - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
+            key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
+        packages:
+          - google-chrome-stable
+        update: true
       script:
         - google-chrome --version
         - npm install -g webdriver-manager
@@ -94,13 +93,11 @@ jobs:
 
     - name: 'Lint'
       stage: 'Code Analisys'
-      install: true
       script:
         - npm run lint
 
     - name: 'Sonar'
       stage: 'Code Analisys'
-      install: true
       addons:
         sonarcloud:
           organization: 'brunodutr-github'
@@ -108,19 +105,17 @@ jobs:
             secure: $SONAR_TOKEN
       script:
         - sonar-scanner -Dsonar.projectVersion=${VERSION}
-  
+
     - stage: 'Build'
-      script: 
+      script:
         - ionic cordova build android --prod --release
-          
+
     - stage: 'Sign Apk'
-      install: true
       script:
         - ./travis/sign.sh
       if: branch IN (master, prod)
 
     - stage: 'Deploy'
-      install: true
       script:
         - ./travis/before_deploy.sh
       deploy:
@@ -139,7 +134,6 @@ jobs:
           tags: false
 
     - stage: 'Release'
-      install: true
       script:
         - ./travis/release.sh
       if: branch = prod
@@ -157,4 +151,3 @@ cache:
     - '$HOME/.gradle/wrapper/'
     - '$HOME/.sonar/cache'
     - './node_modules'
-

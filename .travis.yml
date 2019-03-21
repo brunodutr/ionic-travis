@@ -47,7 +47,6 @@ matrix:
             - jq
             - oracle-java8-installer
             - oracle-java8-set-default
-          update: true
         sonarcloud:
           organization: 'brunodutr-github'
           token:
@@ -56,8 +55,6 @@ matrix:
 before_install:
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
-
-  - nvm install 11
 
   - npm install -g ionic cordova
 
@@ -75,19 +72,18 @@ stages:
 
 jobs:
   include:
-    
     - name: 'Define Version'
       stage: 'Version'
       script:
         - export VERSION=$(node -p -e "require('./package.json').version")
         - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then export SNAPSHOT=false; fi
         - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then export VERSION=${VERSION}-SNAPSHOT && export SNAPSHOT=true ;fi
-    
+
     - name: 'Unit Tests'
       stage: 'Tests'
       script:
         - ng test --watch=false --progress=false --browsers=ChromeHeadlessCI ----code-coverage
-    
+
     - name: 'e2e Tests'
       stage: 'Tests'
       script:
@@ -95,26 +91,26 @@ jobs:
         - npm install -g webdriver-manager
         - webdriver-manager update --standalone false --gecko false --versions.chrome 2.35
         - ng e2e --protractor-config=./e2e/protractor-ci.conf.js --webdriver-update=false
-    
+
     - name: 'Lint'
       stage: 'Code Analisys'
       script:
         - npm run lint
-    
+
     - name: 'Sonar'
       stage: 'Code Analisys'
       script:
         - sonar-scanner -Dsonar.projectVersion=${VERSION}
-    
+
     - stage: 'Build'
       script:
         - ionic cordova build android --prod --release
-    
+
     - stage: 'Sign Apk'
       script:
         - ./travis/sign.sh
       if: branch IN (master, prod)
-    
+
     - stage: 'Deploy'
       script:
         - ./travis/before_deploy.sh
@@ -132,7 +128,7 @@ jobs:
           repo: '$TRAVIS_REPO_SLUG'
           all_branches: true
           tags: false
-    
+
     - stage: 'Release'
       script:
         - ./travis/release.sh
@@ -145,9 +141,9 @@ before_cache:
   - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
 
 cache:
+  npm: true
   directories:
     - '$HOME/.gradle/caches/'
     - '$HOME/.gradle/wrapper/'
     - '$HOME/.sonar/cache'
     - './node_modules'
-

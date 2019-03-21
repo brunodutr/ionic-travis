@@ -66,6 +66,8 @@ jobs:
   include:
     - name: 'Define Version'
       stage: 'Version'
+      before_cache: skip
+      cache: skip
       install: skip
       script:
         - export VERSION=$(node -p -e "require('./package.json').version")
@@ -131,6 +133,8 @@ jobs:
             - jq
             - oracle-java8-installer
             - oracle-java8-set-default
+      before_install:
+        - nvm install 11
       script:
         - ionic cordova build android --prod --release
 

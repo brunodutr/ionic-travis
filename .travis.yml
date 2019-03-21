@@ -66,6 +66,7 @@ jobs:
   include:
     - name: 'Define Version'
       stage: 'Version'
+      install: skip
       script:
         - export VERSION=$(node -p -e "require('./package.json').version")
         - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then export SNAPSHOT=false; fi
@@ -92,11 +93,13 @@ jobs:
         - ng e2e --protractor-config=./e2e/protractor-ci.conf.js --webdriver-update=false
 
     - name: 'Lint'
+      install: skip
       stage: 'Code Analisys'
       script:
         - npm run lint
 
     - name: 'Sonar'
+      install: skip
       stage: 'Code Analisys'
       addons:
         sonarcloud:
@@ -111,11 +114,13 @@ jobs:
         - ionic cordova build android --prod --release
 
     - stage: 'Sign Apk'
+      install: skip
       script:
         - ./travis/sign.sh
       if: branch IN (master, prod)
 
     - stage: 'Deploy'
+      install: skip
       script:
         - ./travis/before_deploy.sh
       deploy:
@@ -134,6 +139,7 @@ jobs:
           tags: false
 
     - stage: 'Release'
+      install: skip
       script:
         - ./travis/release.sh
       if: branch = prod

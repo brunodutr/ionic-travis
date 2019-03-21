@@ -136,6 +136,7 @@ jobs:
       install:
         - nvm install 11
         - npm install -g ionic cordova
+        - npm install
       script:
         - ionic cordova build android --prod --release
 

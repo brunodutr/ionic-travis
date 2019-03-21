@@ -20,7 +20,31 @@ notifications:
   email:
     on_success: never
     on_failure: change
-        
+
+matrix:
+  include:
+    - os: linux
+      sudo: false
+      language: android
+      android:
+        components:
+          - build-tools-27.0.3
+          - android-27
+        licenses:
+          - android-sdk-preview-.+
+          - android-sdk-license-.+
+          - google-gdk-license-.+
+      addons:
+        apt:
+          sources:
+            - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
+              key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
+          packages:
+            - gradle
+            - jq
+            - oracle-java8-installer
+            - oracle-java8-set-default
+
 before_install:
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
@@ -84,33 +108,7 @@ jobs:
             secure: $SONAR_TOKEN
       script:
         - sonar-scanner -Dsonar.projectVersion=${VERSION}
-
-    - stage: 'Build'
-      os: linux
-        sudo: false
-        language: android
-        android:
-          components:
-            - build-tools-27.0.3
-            - android-27
-          licenses:
-            - android-sdk-preview-.+
-            - android-sdk-license-.+
-            - google-gdk-license-.+
-        addons:
-          apt:
-            sources:
-              - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
-                key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
-            packages:
-              - gradle
-              - jq
-              - oracle-java8-installer
-              - oracle-java8-set-default
-
-      script:
-        - ionic cordova build android --prod --release
-
+  
     - stage: 'Sign Apk'
       install: skip
       script:
@@ -142,6 +140,9 @@ jobs:
         - ./travis/release.sh
       if: branch = prod
 
+script:
+  - ionic cordova build android --prod --release
+      
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
@@ -155,3 +156,4 @@ cache:
     - '$HOME/.gradle/wrapper/'
     - '$HOME/.sonar/cache'
     - './node_modules'
+

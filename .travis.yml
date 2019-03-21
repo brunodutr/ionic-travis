@@ -66,7 +66,7 @@ jobs:
   include:
     - name: 'Define Version'
       stage: 'Version'
-      install: skip
+      install: true
       script: 
         - export VERSION=$(node -p -e "require('./package.json').version")
         - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then export SNAPSHOT=false; fi
@@ -94,13 +94,13 @@ jobs:
 
     - name: 'Lint'
       stage: 'Code Analisys'
-      install: skip
+      install: true
       script:
         - npm run lint
 
     - name: 'Sonar'
       stage: 'Code Analisys'
-      install: skip
+      install: true
       addons:
         sonarcloud:
           organization: 'brunodutr-github'
@@ -109,14 +109,18 @@ jobs:
       script:
         - sonar-scanner -Dsonar.projectVersion=${VERSION}
   
+    - stage: 'Build'
+      script: 
+        - ionic cordova build android --prod --release
+          
     - stage: 'Sign Apk'
-      install: skip
+      install: true
       script:
         - ./travis/sign.sh
       if: branch IN (master, prod)
 
     - stage: 'Deploy'
-      install: skip
+      install: true
       script:
         - ./travis/before_deploy.sh
       deploy:
@@ -135,14 +139,11 @@ jobs:
           tags: false
 
     - stage: 'Release'
-      install: skip
+      install: true
       script:
         - ./travis/release.sh
       if: branch = prod
 
-script:
-  - ionic cordova build android --prod --release
-      
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock

@@ -31,7 +31,7 @@ matrix:
           - build-tools-27.0.3
           - android-27
         licenses:
-          - android-sdk-preview-license-52d11cd2
+          - android-sdk-preview-.+
           - android-sdk-license-.+
           - google-gdk-license-.+
       addons:
@@ -60,27 +60,79 @@ before_install:
 
   - npm install -g ionic cordova
 
-  - export VERSION=$(node -p -e "require('./package.json').version")
-
 install:
   - npm install
 
-script:
+stages:
+  - Version
+  - Tests
+  - Code Analisys
+  - Build
+  - Sign Apk
+  - Deploy
+  - Release
 
-  - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then
-    export SNAPSHOT=false;
-    fi
-
-  - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then
-    export VERSION=${VERSION}-SNAPSHOT &&
-    export SNAPSHOT=true ;
-    fi
-
-  - ./travis/build.sh
-
-  - ./travis/sign.sh
-
-  - sonar-scanner -Dsonar.projectVersion=${VERSION}
+jobs:
+  include:
+    
+    - name: 'Define Version'
+      stage: 'Version'
+      script:
+        - export VERSION=$(node -p -e "require('./package.json').version")
+        - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then export SNAPSHOT=false; fi
+        - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then export VERSION=${VERSION}-SNAPSHOT && export SNAPSHOT=true ;fi
+    
+    - name: 'Unit Tests'
+      stage: 'Tests'
+      script:
+        - ng test --watch=false --progress=false --browsers=ChromeHeadlessCI ----code-coverage
+    
+    - name: 'e2e Tests'
+      stage: 'Tests'
+      script:
+        - ng e2e --protractor-config=./e2e/protractor-ci.conf.js
+    
+    - name: 'Lint'
+      stage: 'Code Analisys'
+      script:
+        - npm run lint
+    
+    - name: 'Sonar'
+      stage: 'Code Analisys'
+      script:
+        - sonar-scanner -Dsonar.projectVersion=${VERSION}
+    
+    - stage: 'Build'
+      script:
+        - ionic cordova build android --prod --release
+    
+    - stage: 'Sign Apk'
+      script:
+        - ./travis/sign.sh
+      if: branch IN (master, prod)
+    
+    - stage: 'Deploy'
+      script:
+        - ./travis/before_deploy.sh
+      deploy:
+        provider: releases
+        api_key:
+          secure: '$GITHUB_TOKEN'
+        file_glob: true
+        file: ionictravis-${VERSION}.apk
+        prerelease: '$SNAPSHOT'
+        overwrite: '$SNAPSHOT'
+        name: 'v${VERSION}'
+        skip_cleanup: true
+        on:
+          repo: '$TRAVIS_REPO_SLUG'
+          all_branches: true
+          tags: false
+    
+    - stage: 'Release'
+      script:
+        - ./travis/release.sh
+      if: branch = prod
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -95,23 +147,3 @@ cache:
     - '$HOME/.sonar/cache'
     - './node_modules'
 
-before_deploy:
-  - ./travis/before_deploy.sh
-
-deploy:
-  provider: releases
-  api_key:
-    secure: '$GITHUB_TOKEN'
-  file_glob: true
-  file: ionictravis-${VERSION}.apk
-  prerelease: '$SNAPSHOT'
-  overwrite: '$SNAPSHOT'
-  name: 'v${VERSION}'
-  skip_cleanup: true
-  on:
-    repo: '$TRAVIS_REPO_SLUG'
-    all_branches: true
-    tags: false
-
-after_deploy:
-  - ./travis/release.sh

@@ -69,6 +69,7 @@ jobs:
       before_cache: skip
       cache: skip
       install: skip
+      fast_finish: true
       script:
         - export VERSION=$(node -p -e "require('./package.json').version")
         - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then export SNAPSHOT=false; fi

@@ -48,9 +48,9 @@ matrix:
 before_install:
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
+  - mkdir -p ~/$TRAVIS_BUILD_NUMBER
 
 stages:
-  - Config
   - Version
   - Tests
   - Code Analisys
@@ -64,23 +64,26 @@ fast_finish: true
 
 jobs:
   include:
-    - name: 'Environment Install'
-      stage: Config
-      script:
-        - npm install -g ionic cordova
-
     - name: 'Define Version'
       install: skip
       stage: 'Version'
       script:
         - export VERSION=$(node -p -e "require('./package.json').version")
-        - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then export SNAPSHOT=false; fi
-        - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then export VERSION=${VERSION}-SNAPSHOT && export SNAPSHOT=true ;fi
+        
+        - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then 
+          export SNAPSHOT=false; 
+          fi
+
+        - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then 
+            export VERSION=${VERSION}-SNAPSHOT
+            export SNAPSHOT=true
+          fi
 
     - name: 'Unit Tests'
       stage: 'Tests'
       script:
-        - ng test --watch=false --progress=false --browsers=ChromeHeadlessCI ----code-coverage
+        - ng test --watch=false --progress=false --browsers=ChromeHeadlessCI --code-coverage
+        - mv coverage/lcov.info ~/$TRAVIS_BUILD_NUMBER/lcov.info
 
     - name: 'e2e Tests'
       stage: 'Tests'
@@ -98,20 +101,26 @@ jobs:
 
     - name: 'Lint'
       stage: 'Code Analisys'
-      install: skip
       script:
         - npm run lint
 
     - name: 'Sonar'
       stage: 'Code Analisys'
       install: skip
+      language: generic 
       addons:
         sonarcloud:
           organization: 'brunodutr-github'
           token:
             secure: $SONAR_TOKEN
       script:
-        - sonar-scanner -Dsonar.projectVersion=${VERSION}
+        - sonar-scanner -Dsonar.projectVersion=${VERSION} 
+                        -Dsonar.typescript.lcov.reportPaths=~/$TRAVIS_BUILD_NUMBER/lcov.info
+                        -Dsonar.links.homepage=https://github.com/$TRAVIS_REPO_SLUG
+                        -Dsonar.links.ci=https://travis-ci.com/$TRAVIS_REPO_SLUG
+                        -Dsonar.links.scm=https://github.com/$TRAVIS_REPO_SLUG
+                        -Dsonar.links.issue=https://github.com/$TRAVIS_REPO_SLUG/issues
+
 
     - stage: 'Build'
       os: linux
@@ -135,18 +144,14 @@ jobs:
             - jq
             - oracle-java8-installer
             - oracle-java8-set-default
-      install:
+      before_install:
         - nvm install 11
         - npm install -g ionic cordova
-        - npm install
+      
       script:
         - ionic cordova build android --prod --release
-
-    - stage: 'Sign Apk'
-      install: skip
-      script:
         - ./travis/sign.sh
-      if: branch IN (master, prod)
+        - mv platforms/android/app/build/outputs/apk/release/app.apk ~/$TRAVIS_BUILD_NUMBER/app.apk
 
     - stage: 'Deploy'
       install: skip

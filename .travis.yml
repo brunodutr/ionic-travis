@@ -170,6 +170,7 @@ jobs:
           - '$HOME/.sonar/cache'
           - './node_modules'
       script:
+        - npm ci
         - ionic cordova build android --prod --release
         - ./travis/sign.sh
         - mv platforms/android/app/build/outputs/apk/release/app.apk ~/$TRAVIS_BUILD_NUMBER/app.apk

@@ -57,7 +57,6 @@ stages:
   - Build
   - Deploy
   - Release
-  - Cache Dependencies
 
 fast_finish: true
 
@@ -68,24 +67,32 @@ jobs:
       stage: 'Version'
       script:
         - export VERSION=$(node -p -e "require('./package.json').version")
-        
-        - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then 
-          export SNAPSHOT=false; 
+
+        - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then
+          export SNAPSHOT=false;
           fi
 
-        - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then 
-            export VERSION=${VERSION}-SNAPSHOT &&
-            export SNAPSHOT=true;
+        - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then
+          export VERSION=${VERSION}-SNAPSHOT &&
+          export SNAPSHOT=true;
           fi
 
     - name: 'Unit Tests'
       stage: 'Tests'
+      cache:
+        npm: true
+        directories:
+          - './node_modules'
       script:
         - ng test --watch=false --progress=false --browsers=ChromeHeadlessCI --code-coverage
         - mv coverage/lcov.info ~/$TRAVIS_BUILD_NUMBER/lcov.info
 
     - name: 'e2e Tests'
       stage: 'Tests'
+      cache:
+        npm: true
+        directories:
+          - './node_modules'
       addons:
         sources:
           - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
@@ -105,21 +112,25 @@ jobs:
 
     - name: 'Sonar'
       stage: 'Code Analisys'
-      install: skip
-      language: generic 
+      cache:
+        npm: true
+        directories:
+          - './node_modules'
+          - '$HOME/.sonar/cache'
       addons:
         sonarcloud:
           organization: 'brunodutr-github'
           token:
             secure: $SONAR_TOKEN
       script:
-        - sonar-scanner -Dsonar.projectVersion=${VERSION} 
-                        -Dsonar.typescript.lcov.reportPaths=~/$TRAVIS_BUILD_NUMBER/lcov.info
-                        -Dsonar.links.homepage=https://github.com/$TRAVIS_REPO_SLUG
-                        -Dsonar.links.ci=https://travis-ci.com/$TRAVIS_REPO_SLUG
-                        -Dsonar.links.scm=https://github.com/$TRAVIS_REPO_SLUG
-                        -Dsonar.links.issue=https://github.com/$TRAVIS_REPO_SLUG/issues
-
+        - cat ~/$TRAVIS_BUILD_NUMBER/*
+        - echo ${VERSION}
+        - sonar-scanner -Dsonar.projectVersion=${VERSION}
+          -Dsonar.typescript.lcov.reportPaths=~/${TRAVIS_BUILD_NUMBER}/lcov.info
+          -Dsonar.links.homepage=https://github.com/${TRAVIS_REPO_SLUG}
+          -Dsonar.links.ci=https://travis-ci.com/${TRAVIS_REPO_SLUG}
+          -Dsonar.links.scm=https://github.com/${TRAVIS_REPO_SLUG}
+          -Dsonar.links.issue=https://github.com/${TRAVIS_REPO_SLUG/issues}
 
     - stage: 'Build'
       os: linux
@@ -146,12 +157,23 @@ jobs:
       before_install:
         - nvm install 11
         - npm install -g ionic cordova
-      
+      before_cache:
+        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+        - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
+        - rm -rf $HOME/.gradle/caches/3.5/fileHashes/
+        - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
+      cache:
+        npm: true
+        directories:
+          - '$HOME/.gradle/caches/'
+          - '$HOME/.gradle/wrapper/'
+          - '$HOME/.sonar/cache'
+          - './node_modules'
       script:
         - ionic cordova build android --prod --release
         - ./travis/sign.sh
         - mv platforms/android/app/build/outputs/apk/release/app.apk ~/$TRAVIS_BUILD_NUMBER/app.apk
-  
+
     - stage: 'Deploy'
       install: skip
       script:
@@ -176,18 +198,3 @@ jobs:
       script:
         - ./travis/release.sh
       if: branch = prod
-
-    - stage: 'Cache Dependencies'
-      install: skip
-      before_cache:
-        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-        - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
-        - rm -rf $HOME/.gradle/caches/3.5/fileHashes/
-        - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
-      cache:
-        npm: true
-        directories:
-          - '$HOME/.gradle/caches/'
-          - '$HOME/.gradle/wrapper/'
-          - '$HOME/.sonar/cache'
-          - './node_modules'

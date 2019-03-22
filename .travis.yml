@@ -69,16 +69,9 @@ install:
   - npm install -g ionic cordova  
   - npm install
   - npm install -g webdriver-manager
-  - webdriver-manager update --standalone false --gecko false --versions.chrome 2.35
 
 script:
   - ./travis/tests.sh
-
-  - sonar-scanner -Dsonar.projectVersion=${VERSION}          
-                  -Dsonar.links.homepage=https://github.com/${TRAVIS_REPO_SLUG}
-                  -Dsonar.links.ci=https://travis-ci.com/${TRAVIS_REPO_SLUG}
-                  -Dsonar.links.scm=https://github.com/${TRAVIS_REPO_SLUG}
-                  -Dsonar.links.issue=https://github.com/${TRAVIS_REPO_SLUG}/issues
 
   - ./travis/build.sh
   

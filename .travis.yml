@@ -55,7 +55,6 @@ stages:
   - Tests
   - Code Analisys
   - Build
-  - Sign Apk
   - Deploy
   - Release
   - Cache Dependencies
@@ -75,8 +74,8 @@ jobs:
           fi
 
         - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then 
-            export VERSION=${VERSION}-SNAPSHOT
-            export SNAPSHOT=true
+            export VERSION=${VERSION}-SNAPSHOT &&
+            export SNAPSHOT=true;
           fi
 
     - name: 'Unit Tests'
@@ -152,7 +151,7 @@ jobs:
         - ionic cordova build android --prod --release
         - ./travis/sign.sh
         - mv platforms/android/app/build/outputs/apk/release/app.apk ~/$TRAVIS_BUILD_NUMBER/app.apk
-
+  
     - stage: 'Deploy'
       install: skip
       script:

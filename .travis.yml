@@ -70,6 +70,7 @@ install:
   - npm install
   - npm install -g webdriver-manager
   - webdriver-manager update --standalone false --gecko false --versions.chrome 2.35
+
 script:
   - ./travis/tests.sh
 
@@ -83,7 +84,6 @@ script:
   
   - ./travis/sign.sh
   
-
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock

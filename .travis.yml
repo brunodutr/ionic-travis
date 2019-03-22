@@ -13,9 +13,6 @@ branches:
     - master
     - prod
 
-language: node_js
-node_js: '11'
-
 notifications:
   email:
     recipients:
@@ -31,7 +28,7 @@ matrix:
           - build-tools-27.0.3
           - android-27
         licenses:
-          - android-sdk-preview-license-52d11cd2
+          - android-sdk-preview-.+
           - android-sdk-license-.+
           - google-gdk-license-.+
       addons:
@@ -56,31 +53,36 @@ before_install:
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
 
-  - nvm install 11
-
-  - npm install -g ionic cordova
-
   - export VERSION=$(node -p -e "require('./package.json').version")
 
-install:
-  - npm install
-
-script:
-
   - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then
-    export SNAPSHOT=false;
+      export SNAPSHOT=false;
     fi
 
   - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then
-    export VERSION=${VERSION}-SNAPSHOT &&
-    export SNAPSHOT=true ;
+      export VERSION=${VERSION}-SNAPSHOT &&
+      export SNAPSHOT=true ;
     fi
 
+install:
+  - nvm install 11
+  - npm install -g ionic cordova  
+  - npm install
+  - npm install -g webdriver-manager
+  - webdriver-manager update --standalone false --gecko false --versions.chrome 2.35
+script:
+  - ./travis/tests.sh
+
+  - sonar-scanner -Dsonar.projectVersion=${VERSION}          
+                  -Dsonar.links.homepage=https://github.com/${TRAVIS_REPO_SLUG}
+                  -Dsonar.links.ci=https://travis-ci.com/${TRAVIS_REPO_SLUG}
+                  -Dsonar.links.scm=https://github.com/${TRAVIS_REPO_SLUG}
+                  -Dsonar.links.issue=https://github.com/${TRAVIS_REPO_SLUG}/issues
+
   - ./travis/build.sh
-
+  
   - ./travis/sign.sh
-
-  - sonar-scanner -Dsonar.projectVersion=${VERSION}
+  
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock

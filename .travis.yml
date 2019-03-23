@@ -146,29 +146,11 @@ jobs:
     - name: 'Build IOS'
       stage: 'Build'
       os: osx
+      language: objective-c
       install: true
       scrip: 
         - echo "Build IOS"
     
-    - stage: 'Deploy'
-      install: skip
-      if: type != pull_request
-      script:
-        - ./travis/before_deploy.sh
-      deploy:
-        provider: releases
-        api_key:
-          secure: '$GITHUB_TOKEN'
-        file_glob: true
-        file: ionictravis-${VERSION}.apk
-        prerelease: '$SNAPSHOT'
-        overwrite: '$SNAPSHOT'
-        name: 'v${VERSION}'
-        skip_cleanup: true
-        on:
-          repo: '$TRAVIS_REPO_SLUG'
-          all_branches: true
-          tags: false
 
     - name: 'Package Android'
       stage: 'Package'
@@ -199,10 +181,31 @@ jobs:
     - name: 'Package IOS'
       stage: 'Package'
       os: osx
+      language: objective-c      
       install: true
       scrip: 
         - echo "Package IOS"
-    
+
+      - stage: 'Deploy'
+      install: skip
+      if: type != pull_request
+      script:
+        - ./travis/before_deploy.sh
+      deploy:
+        provider: releases
+        api_key:
+          secure: '$GITHUB_TOKEN'
+        file_glob: true
+        file: ionictravis-${VERSION}.apk
+        prerelease: '$SNAPSHOT'
+        overwrite: '$SNAPSHOT'
+        name: 'v${VERSION}'
+        skip_cleanup: true
+        on:
+          repo: '$TRAVIS_REPO_SLUG'
+          all_branches: true
+          tags: false
+
     - stage: 'Release'
       install: skip
       script:

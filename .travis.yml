@@ -59,9 +59,17 @@ jobs:
           organization: 'brunodutr-github'
           token:
             secure: $SONAR_TOKEN
+        apt:
+          sources:
+            - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
+              key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
+          packages:
+            - python-pip
+          update: true
       cache:
         npm: true
         directories:
+          - '$HOME/python2.7'
           - '$HOME/.sonar/cache'
       before_install:
         - pip install --user awscli
@@ -81,13 +89,15 @@ jobs:
         npm: true
         directories:
           - './node_modules'
+          - '$HOME/python2.7'
       addons:
-        sources:
-          - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
-            key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
-        packages:
-          - python-pip
-        update: true
+        apt:
+          sources:
+            - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
+              key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
+          packages:
+            - python-pip
+          update: true
       before_install:
         - pip install --user awscli
         - mkdir -p ~/shared
@@ -95,7 +105,7 @@ jobs:
       after_success:
         - aws s3 sync ~/shared s3://ionic-travis/$TRAVIS_BUILD_NUMBER
       script:
-        - ng test --watch=false --progress=false --browsers=ChromeHeadlessCI --code-coverage
+        - npm run unit-ci
         - cp coverage/lcov.info ~/shared/lcov.info
 
     - name: 'e2e Tests'
@@ -105,15 +115,16 @@ jobs:
         directories:
           - './node_modules'
       addons:
-        sources:
-          - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
-            key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
-        packages:
-          - google-chrome-stable
-        update: true
+        apt:
+          sources:
+            - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
+              key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
+          packages:
+            - google-chrome-stable
+          update: true
       script:
         - google-chrome-stable --version
-        - ng e2e --protractor-config=./e2e/protractor-ci.conf.js --webdriver-update=false
+        - npm run e2e-ci
 
     - stage: 'Build'
       android:

@@ -132,6 +132,7 @@ jobs:
           - '$HOME/.gradle/wrapper/'
           - './node_modules'
           - '$HOME/.cache/pip'
+          - '$HOME/.npm'
       script:
         - npm install -g ionic cordova
         - ionic cordova build android --prod --release
@@ -187,7 +188,7 @@ jobs:
         - mkdir -p ~/shared
         - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
       after_success:
-        - aws s3 rm --recursive s3://ionic-travis/$TRAVIS_BUILD_NUMBER
+        - aws s3 rm --recursive s3://ionic-travis
       script:
         - mkdir -p coverage
 

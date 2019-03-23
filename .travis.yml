@@ -61,10 +61,9 @@ install:
   - nvm install 11
   - npm install -g ionic cordova  
   - npm install
-  - npm install -g webdriver-manager
   - pip install --user awscli
   - mkdir -p ~/$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER
-  - aws s3 sync s3://$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER ~/$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER
+  - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER
   
 script:
 

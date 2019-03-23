@@ -64,7 +64,7 @@ cache:
 
 jobs:
   include:
-    - stage: "Prepare cache"
+    - stage: 'Prepare cache'
       script: true
 
     - name: 'Lint'
@@ -148,9 +148,8 @@ jobs:
       os: osx
       language: objective-c
       install: true
-      scrip: 
+      scrip:
         - echo "Build IOS"
-    
 
     - name: 'Package Android'
       stage: 'Package'
@@ -177,16 +176,16 @@ jobs:
         - aws s3 sync ~/shared s3://ionic-travis/$TRAVIS_BUILD_NUMBER
       script:
         - ./travis/sign.sh
-    
+
     - name: 'Package IOS'
       stage: 'Package'
       os: osx
-      language: objective-c      
+      language: objective-c
       install: true
-      scrip: 
+      scrip:
         - echo "Package IOS"
 
-      - stage: 'Deploy'
+    - stage: 'Deploy'
       install: skip
       if: type != pull_request
       script:

@@ -6,8 +6,7 @@ npm run lint
 
 npm run unit-ci
 
-webdriver-manager update --standalone false --gecko false --versions.chrome 2.35
-npm run e2e-ci
+cp coverage/lcov.info ~/$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER/lcov.info
 
 sonar-scanner -Dsonar.projectVersion=${VERSION}          
                   -Dsonar.links.homepage=https://github.com/${TRAVIS_REPO_SLUG}

@@ -1,8 +1,10 @@
-dist: trusty
+dist: xenial
+sudo: required
 
 env:
   global:
     - JAVA_HOME=/usr/lib/jvm/java-8-oracle
+    - PATH=$HOME/.local/bin:$PATH
     - LANG=pt_BR.UTF-8
     - CHROME_BIN=google-chrome
     - VERSION-BUILD-TOOLS=27.0.3
@@ -46,7 +48,6 @@ matrix:
             - oracle-java8-installer
             - oracle-java8-set-default
             - python-pip
-          update: true
         sonarcloud:
           organization: 'brunodutr-github'
           token:
@@ -74,7 +75,7 @@ install:
   - npm install -g webdriver-manager
   - pip install --user awscli
   - mkdir -p ~/$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER
-  - aws s3 sync s3://travis-build-stages-shared-storage-test/$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER ~/$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER
+  - aws s3 sync s3://$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER ~/$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER
 
 script:
   - ./travis/tests.sh

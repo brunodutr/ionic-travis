@@ -65,7 +65,7 @@ jobs:
             - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
               key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
           packages:
-            - python3.6
+            - python
             - python-pip
           update: true
       cache:

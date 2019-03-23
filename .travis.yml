@@ -1,7 +1,7 @@
 dist: trusty
 
-language: node_js
-node_js: '11'
+sudo: false
+language: android
 
 env:
   global:
@@ -21,9 +21,6 @@ notifications:
     on_success: never
     on_failure: change
 
-sudo: false
-language: android
-
 stages:
   - Tests
   - Code Analisys
@@ -33,7 +30,7 @@ stages:
 
 fast_finish: true
 
-install: 
+install:
   - nvm install 11
   - npm install
 
@@ -66,11 +63,11 @@ jobs:
         npm: true
         directories:
           - '$HOME/.sonar/cache'
-      before_install: 
+      before_install:
         - pip install --user awscli
         - mkdir -p ~/shared
         - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
-      script: 
+      script:
         - sonar-scanner -Dsonar.projectVersion=${VERSION}
           -Dsonar.links.homepage=https://github.com/${TRAVIS_REPO_SLUG}
           -Dsonar.links.ci=https://travis-ci.com/${TRAVIS_REPO_SLUG}
@@ -87,11 +84,11 @@ jobs:
       addons:
         sources:
           - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
-              key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
+            key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
         packages:
           - python-pip
         update: true
-      before_install: 
+      before_install:
         - pip install --user awscli
         - mkdir -p ~/shared
         - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
@@ -119,9 +116,6 @@ jobs:
         - ng e2e --protractor-config=./e2e/protractor-ci.conf.js --webdriver-update=false
 
     - stage: 'Build'
-      os: linux
-      sudo: false
-      language: android
       android:
         components:
           - build-tools-28.0.3
@@ -155,12 +149,12 @@ jobs:
           - './node_modules'
       script:
         - npm install -g ionic cordova
-        - ionic cordova build android --prod --release
-        
-        - ./travis/sign.sh
-      
-        - ./travis/before_deploy.sh
 
+        - ionic cordova build android --prod --release
+
+        - ./travis/sign.sh
+
+        - ./travis/before_deploy.sh
 
     - stage: 'Deploy'
       install: skip

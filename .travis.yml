@@ -25,6 +25,7 @@ stages:
   - Tests
   - Build
   - Deploy
+  - Package
   - Release
   - Code Analisys
 
@@ -45,20 +46,35 @@ install:
     export SNAPSHOT=true ;
     fi
 
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
+  - rm -rf $HOME/.gradle/caches/3.5/fileHashes/
+  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - '$HOME/.gradle/caches/'
+    - '$HOME/.gradle/wrapper/'
+    - './node_modules'
+    - '$HOME/.cache/pip'
+    - '$HOME/.npm'
+    - '$HOME/.sonar/cache'
+
 jobs:
   include:
+    - stage: "Prepare cache"
+      script: true
+
     - name: 'Lint'
+      install:
+        - nvm install 11
       stage: 'Tests'
       script:
         - npm run lint
 
     - name: 'Unit Tests'
       stage: 'Tests'
-      cache:
-        npm: true
-        directories:
-          - './node_modules'
-          - '$HOME/.cache/pip'
       addons:
         apt:
           sources:
@@ -81,10 +97,6 @@ jobs:
 
     - name: 'e2e Tests'
       stage: 'Tests'
-      cache:
-        npm: true
-        directories:
-          - './node_modules'
       addons:
         apt:
           sources:
@@ -94,11 +106,16 @@ jobs:
             - google-chrome-stable
           update: true
       script:
-        - google-chrome-stable --version
         - npm run e2e-ci
 
     - name: 'Build Android'
       stage: 'Build'
+      before_install:
+        - pip install --user awscli
+        - mkdir -p ~/shared
+        - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
+      after_success:
+        - aws s3 sync ~/shared s3://ionic-travis/$TRAVIS_BUILD_NUMBER
       android:
         components:
           - build-tools-28.0.3
@@ -120,19 +137,6 @@ jobs:
             - oracle-java8-set-default
             - python3.6
           update: true
-      before_cache:
-        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-        - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
-        - rm -rf $HOME/.gradle/caches/3.5/fileHashes/
-        - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
-      cache:
-        npm: true
-        directories:
-          - '$HOME/.gradle/caches/'
-          - '$HOME/.gradle/wrapper/'
-          - './node_modules'
-          - '$HOME/.cache/pip'
-          - '$HOME/.npm'
       script:
         - npm install -g ionic cordova
         - ionic cordova build android --prod --release
@@ -157,6 +161,30 @@ jobs:
           all_branches: true
           tags: false
 
+    - name: 'Package Android'
+      stage: 'Package'
+      addons:
+        apt:
+          sources:
+            - deadsnakes
+          packages:
+            - python3.6
+          update: true
+      before_install:
+        - pip install --user awscli
+        - mkdir -p ~/shared
+        - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
+      after_success:
+        - aws s3 sync ~/shared s3://ionic-travis/$TRAVIS_BUILD_NUMBER
+      script:
+        - ./travis/sign.sh
+    
+    - name: 'Package IOS'
+      stage: 'Package'
+      os: osx
+      scrip: 
+        - echo "Package IOS"
+    
     - stage: 'Release'
       install: skip
       script:
@@ -178,11 +206,6 @@ jobs:
           packages:
             - python3.6
           update: true
-      cache:
-        npm: true
-        directories:
-          - '$HOME/.cache/pip'
-          - '$HOME/.sonar/cache'
       before_install:
         - pip install --user awscli
         - mkdir -p ~/shared

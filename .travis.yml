@@ -23,6 +23,7 @@ matrix:
     - os: linux
       sudo: false
       language: android
+      fast_finish: true
       android:
         components:
           - build-tools-27.0.3
@@ -71,6 +72,9 @@ install:
   - npm install -g ionic cordova  
   - npm install
   - npm install -g webdriver-manager
+  - pip install --user awscli
+  - mkdir -p ~/$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER
+  - aws s3 sync s3://travis-build-stages-shared-storage-test/$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER ~/$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER
 
 script:
   - ./travis/tests.sh

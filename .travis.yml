@@ -23,10 +23,10 @@ notifications:
 
 stages:
   - Tests
-  - Code Analisys
   - Build
   - Deploy
   - Release
+  - Code Analisys
 
 fast_finish: true
 
@@ -47,63 +47,27 @@ install:
 
 jobs:
   include:
-    - stage: 'Code Analisys'
-      name: 'Lint'
+    - name: 'Lint'
+      stage: 'Tests'
       script:
         - npm run lint
 
-    - stage: 'Code Analisys'
-      name: 'Sonar'
-      install: 
-        - nvm install 11
-      addons:
-        sonarcloud:
-          organization: 'brunodutr-github'
-          token:
-            secure: $SONAR_TOKEN
-        apt:
-          sources:
-            - deadsnakes
-          packages:
-            - python3.6
-          update: true
-      cache:
-        npm: true
-        directories:
-          - '$HOME/python3.6'
-          - '$HOME/.sonar/cache'
-      before_install:
-        - pip install --user awscli
-        - mkdir -p ~/shared
-        - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
-      script:
-        - mkdir -p coverage
-        
-        - mv ~/shared/lcov.info coverage/lcov.info
-        
-        - sonar-scanner -Dsonar.projectVersion=${VERSION}
-          -Dsonar.links.homepage=https://github.com/${TRAVIS_REPO_SLUG}
-          -Dsonar.links.ci=https://travis-ci.com/${TRAVIS_REPO_SLUG}
-          -Dsonar.links.scm=https://github.com/${TRAVIS_REPO_SLUG}
-          -Dsonar.links.issue=https://github.com/${TRAVIS_REPO_SLUG}/issues
-          
-    - stage: 'Tests'
-      name: 'Unit Tests'
+    - name: 'Unit Tests'
+      stage: 'Tests'
       cache:
         npm: true
         directories:
           - './node_modules'
-          - '$HOME/python2.7'
+          - '$HOME/.cache/pip'
       addons:
         apt:
           sources:
-            - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
-              key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
+            - deadsnakes
             - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
               key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
           packages:
             - google-chrome-stable
-            - python-pip
+            - python3.6
           update: true
       before_install:
         - pip install --user awscli
@@ -133,7 +97,8 @@ jobs:
         - google-chrome-stable --version
         - npm run e2e-ci
 
-    - stage: 'Build'
+    - name: 'Build Android'
+      stage: 'Build'
       android:
         components:
           - build-tools-28.0.3
@@ -145,6 +110,7 @@ jobs:
       addons:
         apt:
           sources:
+            - deadsnakes
             - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
               key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
           packages:
@@ -152,7 +118,7 @@ jobs:
             - jq
             - oracle-java8-installer
             - oracle-java8-set-default
-            - python-pip
+            - python3.6
           update: true
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -165,9 +131,9 @@ jobs:
           - '$HOME/.gradle/caches/'
           - '$HOME/.gradle/wrapper/'
           - './node_modules'
+          - '$HOME/.cache/pip'
       script:
         - npm install -g ionic cordova
-
         - ionic cordova build android --prod --release
 
     - stage: 'Deploy'
@@ -196,7 +162,39 @@ jobs:
         - ./travis/release.sh
       if: branch = prod
 
-    - stage: 'Clear'
-      install: skip
+    - name: 'Sonar'
+      stage: 'Code Analisys'
+      install:
+        - nvm install 11
+      addons:
+        sonarcloud:
+          organization: 'brunodutr-github'
+          token:
+            secure: $SONAR_TOKEN
+        apt:
+          sources:
+            - deadsnakes
+          packages:
+            - python3.6
+          update: true
+      cache:
+        npm: true
+        directories:
+          - '$HOME/.cache/pip'
+          - '$HOME/.sonar/cache'
+      before_install:
+        - pip install --user awscli
+        - mkdir -p ~/shared
+        - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
       after_success:
         - aws s3 rm --recursive s3://ionic-travis/$TRAVIS_BUILD_NUMBER
+      script:
+        - mkdir -p coverage
+
+        - mv ~/shared/lcov.info coverage/lcov.info
+
+        - sonar-scanner -Dsonar.projectVersion=${VERSION}
+          -Dsonar.links.homepage=https://github.com/${TRAVIS_REPO_SLUG}
+          -Dsonar.links.ci=https://travis-ci.com/${TRAVIS_REPO_SLUG}
+          -Dsonar.links.scm=https://github.com/${TRAVIS_REPO_SLUG}
+          -Dsonar.links.issue=https://github.com/${TRAVIS_REPO_SLUG}/issues

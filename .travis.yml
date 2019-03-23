@@ -141,7 +141,15 @@ jobs:
       script:
         - npm install -g ionic cordova
         - ionic cordova build android --prod --release
+        - cp platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk ~/shared/app-release-unsigned.apk
 
+    - name: 'Build IOS'
+      stage: 'Build'
+      os: osx
+      install: true
+      scrip: 
+        - echo "Build IOS"
+    
     - stage: 'Deploy'
       install: skip
       if: type != pull_request
@@ -164,6 +172,14 @@ jobs:
 
     - name: 'Package Android'
       stage: 'Package'
+      android:
+        components:
+          - build-tools-28.0.3
+          - android-28
+        licenses:
+          - android-sdk-preview-.+
+          - android-sdk-license-.+
+          - google-gdk-license-.+
       addons:
         apt:
           sources:
@@ -183,6 +199,7 @@ jobs:
     - name: 'Package IOS'
       stage: 'Package'
       os: osx
+      install: true
       scrip: 
         - echo "Package IOS"
     

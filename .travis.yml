@@ -55,6 +55,18 @@ matrix:
 before_install:
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
+  - google-chrome-stable --version
+
+install:
+  - nvm install 11
+  - npm install -g ionic cordova  
+  - npm install
+  - npm install -g webdriver-manager
+  - pip install --user awscli
+  - mkdir -p ~/$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER
+  - aws s3 sync s3://$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER ~/$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER
+  
+script:
 
   - export VERSION=$(node -p -e "require('./package.json').version")
 
@@ -67,16 +79,6 @@ before_install:
       export SNAPSHOT=true ;
     fi
 
-install:
-  - nvm install 11
-  - npm install -g ionic cordova  
-  - npm install
-  - npm install -g webdriver-manager
-  - pip install --user awscli
-  - mkdir -p ~/$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER
-  - aws s3 sync s3://$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER ~/$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER
-
-script:
   - ./travis/tests.sh
 
   - ./travis/build.sh

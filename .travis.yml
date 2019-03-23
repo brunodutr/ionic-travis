@@ -76,6 +76,8 @@ jobs:
         - mkdir -p ~/shared
         - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
       script:
+        - cat ~/shared/*
+
         - sonar-scanner -Dsonar.projectVersion=${VERSION}
           -Dsonar.links.homepage=https://github.com/${TRAVIS_REPO_SLUG}
           -Dsonar.links.ci=https://travis-ci.com/${TRAVIS_REPO_SLUG}
@@ -166,12 +168,9 @@ jobs:
 
         - ionic cordova build android --prod --release
 
-        - ./travis/sign.sh
-
-        - ./travis/before_deploy.sh
-
     - stage: 'Deploy'
       install: skip
+      if: type != pull_request
       script:
         - ./travis/before_deploy.sh
       deploy:
@@ -198,4 +197,4 @@ jobs:
     - stage: 'Clear'
       install: skip
       after_success:
-        - aws s3 sync ~/$TRAVIS_BUILD_NUMBER s3://travis-build-stages-shared-storage-test/$TRAVIS_BUILD_NUMBER
+        - aws s3 rm --recursive s3://ionic-travis/$TRAVIS_BUILD_NUMBER

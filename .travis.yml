@@ -66,7 +66,6 @@ jobs:
             - deadsnakes
           packages:
             - python3.6
-            - python-pip
           update: true
       cache:
         npm: true
@@ -78,7 +77,7 @@ jobs:
         - mkdir -p ~/shared
         - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
       script:
-        - mvdir -p coverage
+        - mkdir -p coverage
         
         - mv ~/shared/lcov.info coverage/lcov.info
         

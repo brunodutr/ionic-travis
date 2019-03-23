@@ -54,7 +54,8 @@ jobs:
 
     - stage: 'Code Analisys'
       name: 'Sonar'
-      install: skip
+      install: 
+        - nvm install 11
       addons:
         sonarcloud:
           organization: 'brunodutr-github'

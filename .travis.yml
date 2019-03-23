@@ -54,6 +54,7 @@ jobs:
 
     - stage: 'Code Analisys'
       name: 'Sonar'
+      install: skip
       addons:
         sonarcloud:
           organization: 'brunodutr-github'
@@ -64,26 +65,26 @@ jobs:
             - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
               key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
           packages:
+            - python3.6
             - python-pip
           update: true
       cache:
         npm: true
         directories:
-          - '$HOME/python2.7'
+          - '$HOME/python*'
           - '$HOME/.sonar/cache'
       before_install:
         - pip install --user awscli
         - mkdir -p ~/shared
         - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
       script:
-        - cat ~/shared/*
-
+        
         - sonar-scanner -Dsonar.projectVersion=${VERSION}
           -Dsonar.links.homepage=https://github.com/${TRAVIS_REPO_SLUG}
           -Dsonar.links.ci=https://travis-ci.com/${TRAVIS_REPO_SLUG}
           -Dsonar.links.scm=https://github.com/${TRAVIS_REPO_SLUG}
           -Dsonar.links.issue=https://github.com/${TRAVIS_REPO_SLUG}/issues
-          -Dsonar.typescript.lcov.reportPaths=~/shared/lcov.info
+          -Dsonar.typescript.lcov.reportPaths=../../../shared/lcov.info
 
     - stage: 'Tests'
       name: 'Unit Tests'

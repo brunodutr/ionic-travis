@@ -22,6 +22,7 @@ notifications:
     on_failure: change
 
 stages:
+  - Prepare Cache
   - Tests
   - Build
   - Deploy

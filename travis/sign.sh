@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 sign_apk () {
 
     file=$1
@@ -20,7 +22,7 @@ sign_apk () {
 
 }
 
-curl -O ${S3_URL}/build/${$TRAVIS_BUILD_NUMBER}/app-release-unsigned.apk
+curl -O "${S3_URL}/build/${$TRAVIS_BUILD_NUMBER}/app-release-unsigned.apk"
 
 if [ -f app-release-unsigned.apk ]; then
     

@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 set -e 
 
 export GITHUB=https://github.com/${TRAVIS_REPO_SLUG}
@@ -7,8 +9,8 @@ echo "**********************************"
 echo "*        Download Files          *"
 echo "**********************************"
 
-curl -O ${S3_URL}/build/${$TRAVIS_BUILD_NUMBER}/lcov.info
-curl -O ${S3_URL}/build/${$TRAVIS_BUILD_NUMBER}/version
+curl -O "${S3_URL}/build/${$TRAVIS_BUILD_NUMBER}/lcov.info"
+curl -O "${S3_URL}/build/${$TRAVIS_BUILD_NUMBER}/version"
 
 if [ -f version ]; then
     

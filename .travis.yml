@@ -47,6 +47,17 @@ cache:
       - '$HOME/.sonar/cache'
       - '$HOME/Library/Caches/Homebrew'
 
+android_configuration: &android_configuration
+  android:
+    components:
+      - build-tools-28.0.3
+      - android-28
+    licenses:
+      - android-sdk-preview-.+
+      - android-sdk-license-.+
+      - google-gdk-license-.+
+  jdk: oraclejdk8
+
 s3: &s3
   before_install:
     - pip install --user awscli
@@ -95,21 +106,8 @@ jobs:
 
     - name: 'Build Android'
       stage: 'Build'
-      before_install:
-        - pip install --user awscli
-        - mkdir -p ~/shared
-        - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
-      after_success:
-        - aws s3 sync ~/shared s3://ionic-travis/$TRAVIS_BUILD_NUMBER
-      android:
-        components:
-          - build-tools-28.0.3
-          - android-28
-        licenses:
-          - android-sdk-preview-.+
-          - android-sdk-license-.+
-          - google-gdk-license-.+
-      jdk: oraclejdk8
+      <<: *s3
+      <<: *android_configuration
       addons:
         apt:
           sources:
@@ -145,14 +143,8 @@ jobs:
 
     - name: 'Package Android'
       stage: 'Package'
-      android:
-        components:
-          - build-tools-28.0.3
-          - android-28
-        licenses:
-          - android-sdk-preview-.+
-          - android-sdk-license-.+
-          - google-gdk-license-.+
+      <<: *s3
+      <<: *android_configuration
       addons:
         apt:
           sources:
@@ -160,13 +152,7 @@ jobs:
           packages:
             - python3.6
           update: true
-      before_install:
-        - pip install --user awscli
-        - mkdir -p ~/shared
-        - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
       install: skip
-      after_success:
-        - aws s3 sync ~/shared s3://ionic-travis/$TRAVIS_BUILD_NUMBER
       script:
         - ./travis/sign.sh
         - cp build/app.apk ~/shared/app.apk
@@ -209,6 +195,7 @@ jobs:
       stage: 'Code Analisys'
       install:
         - nvm install 11
+      <<: *s3
       addons:
         sonarcloud:
           organization: 'brunodutr-github'
@@ -220,10 +207,6 @@ jobs:
           packages:
             - python3.6
           update: true
-      before_install:
-        - pip install --user awscli
-        - mkdir -p ~/shared
-        - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
       after_success:
         - aws s3 rm --recursive s3://ionic-travis
       script:
@@ -231,6 +214,12 @@ jobs:
 
         - mv ~/shared/lcov.info coverage/lcov.info
 
+        - export VERSION=cat ~/shared/version
+        - export SNAPSHOT=cat ~/shared/snapshot
+
+        - echo $VERSION
+        - echo $SNAPSHOT
+        
         - sonar-scanner -Dsonar.projectVersion=${VERSION}
           -Dsonar.links.homepage=https://github.com/${TRAVIS_REPO_SLUG}
           -Dsonar.links.ci=https://travis-ci.com/${TRAVIS_REPO_SLUG}

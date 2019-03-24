@@ -20,6 +20,17 @@ sign_apk () {
 
 }
 
-mkdir -p build
-mv ~/shared/app-release-unsigned.apk build/app-release-unsigned.apk
-sign_apk app-release-unsigned.apk build
+curl -O ${S3_URL}/build/${$TRAVIS_BUILD_NUMBER}/app-release-unsigned.apk
+
+if [ -f app-release-unsigned.apk ]; then
+    
+    if  [ -s app-release-unsigned.apk ]; then
+        echo 'File was bad or empty'
+        exit 1
+    fi
+
+    mkdir -p build
+    mv app-release-unsigned.apk build/app-release-unsigned.apk
+    sign_apk app-release-unsigned.apk build
+
+fi

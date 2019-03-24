@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-#!/usr/bin/env bash
-
 echo 'Fetching cache...'
         
 curl -O https://s3-sa-east-1.amazonaws.com/ionic-travis/osx-cache/homebrew-cache.tar.gz

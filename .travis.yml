@@ -10,6 +10,7 @@ env:
     - CHROME_BIN=google-chrome
     - VERSION-BUILD-TOOLS=27.0.3
     - VERSION-ANDROID=27
+    - S3_URL=https://s3-sa-east-1.amazonaws.com/ionic-travis
 
 branches:
   only:
@@ -25,10 +26,10 @@ stages:
   - Configuration
   - Tests
   - Build
-  - Deploy
   - Package
-  - Release
+  - Deploy
   - Code Analisys
+  - Release
 
 fast_finish: true
 
@@ -62,9 +63,18 @@ s3: &s3
   before_install:
     - pip install --user awscli
     - mkdir -p ~/shared
-    - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
+    - aws s3 sync s3://ionic-travis/build/$TRAVIS_BUILD_NUMBER ~/shared --acl "public-read"
   after_success:
-    - aws s3 sync ~/shared s3://ionic-travis/$TRAVIS_BUILD_NUMBER
+    - aws s3 sync ~/shared s3://ionic-travis/build/$TRAVIS_BUILD_NUMBER --acl "public-read"
+
+deploy_s3: &deploy_s3
+  deploy:
+    provider: s3
+    bucket: ionic-travis
+    access_key_id: $AWS_ACCESS_KEY_ID
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    skip_cleanup: true
+    acl: public_read
 
 test: &test
   stage: 'Tests'
@@ -82,6 +92,7 @@ test: &test
 
 jobs:
   include:
+
     - <<: *test
       name: 'Get Version'
       stage: 'Configuration'
@@ -103,31 +114,33 @@ jobs:
       name: 'e2e Tests'
       script:
         - npm run e2e-ci
+      before_install: skip
+      after_success: skip
 
     - name: 'Build Android'
       stage: 'Build'
-      <<: *s3
       <<: *android_configuration
       addons:
         apt:
           sources:
-            - deadsnakes
             - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
               key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
           packages:
             - gradle
             - jq
-            - python3.6
           update: true
       script:
         - npm i -g ionic cordova
         - ionic cordova build android --prod --release
-        - cp platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk ~/shared/app-release-unsigned.apk
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
         - rm -rf $HOME/.gradle/caches/3.5/fileHashes/
         - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
+      <<: *deploy_s3
+      deploy:
+        local_dir: platforms/android/app/build/outputs/apk/release
+        upload-dir: build/$TRAVIS_BUILD_NUMBER
 
     - name: 'Build IOS'
       stage: 'Build'
@@ -138,35 +151,27 @@ jobs:
         - ./travis/osx/install.sh
       script:
         - ionic cordova build ios --prod --release
-      cache: skip
+      cache:
+        - yarn
+        - cocoapods
       before_cache: skip
       before_deploy:
         - ./travis/osx/before_deploy.sh
+      <<: *deploy_s3
       deploy:
-        provider: s3
-        bucket: ionic-travis
-        access_key_id: $AWS_ACCESS_KEY_ID
-        secret_access_key: $AWS_SECRET_ACCESS_KEY
-        skip_cleanup: true
-        acl: public_read
         local_dir: s3-cache
         upload-dir: osx-cache
 
     - name: 'Package Android'
       stage: 'Package'
-      <<: *s3
       <<: *android_configuration
-      addons:
-        apt:
-          sources:
-            - deadsnakes
-          packages:
-            - python3.6
-          update: true
       install: skip
       script:
         - ./travis/sign.sh
-        - cp build/app.apk ~/shared/app.apk
+      <<: *deploy_s3
+      deploy:
+        local_dir: build
+        upload-dir: build/$TRAVIS_BUILD_NUMBER
 
     - name: 'Package IOS'
       stage: 'Package'
@@ -180,6 +185,20 @@ jobs:
       install: skip
       if: type != pull_request
       script:
+        - curl -O ${S3_URL}/build/${$TRAVIS_BUILD_NUMBER}/snapshot
+
+        - cat snapshot | while read LINE; do
+          export SNAPSHOT=$LINE
+          echo $SNAPSHOT
+          done
+
+        - curl -O ${S3_URL}/build/${$TRAVIS_BUILD_NUMBER}/version
+
+        - cat ~/shared/version | while read LINE; do
+          export VERSION=$LINE
+          echo $VERSION
+          done
+
         - ./travis/before_deploy.sh
       deploy:
         provider: releases
@@ -204,19 +223,12 @@ jobs:
 
     - name: 'Sonar'
       stage: 'Code Analisys'
-      <<: *s3
       addons:
         sonarcloud:
           organization: 'brunodutr-github'
           token:
             secure: $SONAR_TOKEN
-        apt:
-          sources:
-            - deadsnakes
-          packages:
-            - python3.6
-          update: true
       after_success:
-        - aws s3 rm --recursive s3://ionic-travis
+        - aws s3 rm --recursive s3://ionic-travis/build
       script:
         - ./travis/sonar.sh

@@ -2,7 +2,10 @@ set -e
 
 echo "BRANCH: $TRAVIS_BRANCH | PREPARE DEPLOY"
 
-ln -s ~/$TRAVIS_BUILD_NUMBER/*.apk ionictravis-${VERSION}.apk
+curl -O ${S3_URL}/build/${$TRAVIS_BUILD_NUMBER}/app.apk
+
+ln -s app.apk ionictravis-${VERSION}.apk
+
 git tag -f v${VERSION}
 git remote add travis https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}
 git push travis :v${VERSION} || true

@@ -9,9 +9,12 @@ cat ~/shared/version | while read LINE; do
     echo $VERSION
 done
 
-sonar-scanner -Dsonar.projectVersion=${VERSION}
-              -Dsonar.links.homepage=https://github.com/${TRAVIS_REPO_SLUG}
-              -Dsonar.links.ci=https://travis-ci.com/${TRAVIS_REPO_SLUG}
-              -Dsonar.links.scm=https://github.com/${TRAVIS_REPO_SLUG}
-              -Dsonar.links.issue=https://github.com/${TRAVIS_REPO_SLUG}/issues
+export GITHUB=https://github.com/${TRAVIS_REPO_SLUG}
+export SONAR_TRAVIS=https://travis-ci.com/${TRAVIS_REPO_SLUG}
+
+sonar-scanner -Dsonar.projectVersion=${VERSION} \
+-Dsonar.links.homepage=${GITHUB} \
+-Dsonar.links.ci=${SONAR_TRAVIS} \
+-Dsonar.links.scm=${GITHUB} \
+-Dsonar.links.issue=${GITHUB}/issues
 

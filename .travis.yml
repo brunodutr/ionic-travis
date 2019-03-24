@@ -46,8 +46,8 @@ cache:
   directories:
     - '$HOME/.gradle/caches/'
     - '$HOME/.gradle/wrapper/'
-    - '$HOME/Library/Caches/Yarn/'
-    - '$HOME/.cache/yarn/'
+    - '$HOME/Library/Caches/Yarn'
+    - '$HOME/.cache/yarn'
     - '$HOME/.cache/pip'
     - '$HOME/.sonar/cache'
     - './node_modules'
@@ -122,8 +122,11 @@ jobs:
           sources:
             - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
               key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
+            - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
+              key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
           packages:
             - google-chrome-stable
+            - yarn
           update: true
       script:
         - npm run e2e-ci

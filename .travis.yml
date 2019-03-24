@@ -67,8 +67,6 @@ jobs:
         - pip install --user awscli
         - mkdir -p ~/shared
         - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
-      install:
-        - nvm install 11
       script:
         - export VERSION=$(node -p -e "require('./package.json').version")
 

@@ -34,7 +34,7 @@ fast_finish: true
 
 install:
   - nvm install 11
-  - yarn install
+  - npm install
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -98,12 +98,9 @@ jobs:
             - deadsnakes
             - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
               key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
-            - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
-              key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
           packages:
             - google-chrome-stable
             - python3.6
-            - yarn
           update: true
       before_install:
         - pip install --user awscli
@@ -122,11 +119,8 @@ jobs:
           sources:
             - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
               key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
-            - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
-              key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
           packages:
             - google-chrome-stable
-            - yarn
           update: true
       script:
         - npm run e2e-ci
@@ -158,11 +152,9 @@ jobs:
             - gradle
             - jq
             - python3.6
-            - yarn
           update: true
       script:
-        - yarn install
-        - yarn global add ionic cordova
+        - npm i -g ionic cordova
         - ionic cordova build android --prod --release
         - cp platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk ~/shared/app-release-unsigned.apk
 

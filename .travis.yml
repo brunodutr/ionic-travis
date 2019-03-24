@@ -80,8 +80,6 @@ jobs:
 
     - name: 'Lint'
       stage: 'Tests'
-      install:
-        - nvm install 11
       script:
         - npm run lint
 

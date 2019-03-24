@@ -68,23 +68,11 @@ test: &test
 
 jobs:
   include:
-    - name: 'Get Version'
+    - <<: *test
+      name: 'Get Version'
       stage: 'Configuration'
       script:
-        - export VERSION=$(node -p -e "require('./package.json').version")
-
-        - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then
-          export SNAPSHOT=false;
-          fi
-
-        - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then
-          export VERSION=${VERSION}-SNAPSHOT &&
-          export SNAPSHOT=true ;
-          fi
-
-        - echo ${VERSION} | tee > ~/shared/version
-      after_success:
-        - aws s3 sync ~/shared s3://ionic-travis/$TRAVIS_BUILD_NUMBER
+        - ./travis/config/version.sh
 
     - name: 'Lint'
       stage: 'Tests'

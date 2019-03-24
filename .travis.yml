@@ -36,21 +36,17 @@ install:
   - nvm install 11
   - npm install
 
-before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
-  - rm -rf $HOME/.gradle/caches/3.5/fileHashes/
-  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
 
 cache:
+  - npm
+  - pip
+  - yarn
+  - cocoapods
   directories:
     - '$HOME/.gradle/caches/'
     - '$HOME/.gradle/wrapper/'
-    - '$HOME/Library/Caches/Yarn'
-    - '$HOME/.cache/yarn'
-    - '$HOME/.cache/pip'
     - '$HOME/.sonar/cache'
-    - './node_modules'
+    - '$HOME/Library/Caches/Homebrew'
 
 jobs:
   include:
@@ -157,6 +153,11 @@ jobs:
         - npm i -g ionic cordova
         - ionic cordova build android --prod --release
         - cp platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk ~/shared/app-release-unsigned.apk
+      before_cache:
+        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+        - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
+        - rm -rf $HOME/.gradle/caches/3.5/fileHashes/
+        - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
 
     - name: 'Build IOS'
       stage: 'Build'
@@ -167,6 +168,8 @@ jobs:
         - ./travis/osx/install.sh
       script:
         - ionic cordova build ios --prod --release
+      before_cache:
+        - brew cleanup
 
     - name: 'Package Android'
       stage: 'Package'

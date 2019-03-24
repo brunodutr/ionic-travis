@@ -147,15 +147,16 @@ jobs:
       stage: 'Build'
       os: osx
       language: objective-c
-      osx_image: xcode8.3
       install: 
         - brew update
         - brew install yarn ios-sim jq ios-deploy cocoapods
         - rvm use system
         - pod setup 
-      scrip:
-        - echo "Build IOS"
-
+      script:
+        - yarn install
+        - yarn global add ionic cordova
+        - ionic cordova build ios
+      
     - name: 'Package Android'
       stage: 'Package'
       android:
@@ -187,7 +188,7 @@ jobs:
       os: osx
       language: objective-c
       install: true
-      scrip:
+      script:
         - echo "Package IOS"
 
     - stage: 'Deploy'

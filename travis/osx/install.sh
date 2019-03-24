@@ -2,6 +2,8 @@
 
 HOMEBREW_YARN_INSTALLED="$(brew ls | grep -c yarn)"
 
+echo $HOMEBREW_EMACS_INSTALLED
+
 if ! [[ $HOMEBREW_EMACS_INSTALLED -eq 1 ]]; then
   echo 'Installing dependencies...'
   brew update

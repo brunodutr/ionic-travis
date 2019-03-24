@@ -147,7 +147,6 @@ jobs:
       deploy:
         provider: s3
         bucket: ionic-travis
-        region: $AWS_DEFAULT_REGION
         access_key_id: $AWS_ACCESS_KEY_ID
         secret_access_key: $AWS_SECRET_ACCESS_KEY
         skip_cleanup: true

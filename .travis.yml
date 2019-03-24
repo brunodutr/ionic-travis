@@ -147,7 +147,12 @@ jobs:
       stage: 'Build'
       os: osx
       language: objective-c
-      install: true
+      osx_image: xcode8.3
+      install: 
+        - brew update
+        - brew install yarn ios-sim jq ios-deploy cocoapods
+        - rvm use system
+        - pod setup 
       scrip:
         - echo "Build IOS"
 

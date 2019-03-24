@@ -22,7 +22,7 @@ notifications:
     on_failure: change
 
 stages:
-  - Prepare Cache
+  - Configuration
   - Tests
   - Build
   - Deploy
@@ -34,18 +34,7 @@ fast_finish: true
 
 install:
   - nvm install 11
-  - npm install
-
-  - export VERSION=$(node -p -e "require('./package.json').version")
-
-  - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then
-    export SNAPSHOT=false;
-    fi
-
-  - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then
-    export VERSION=${VERSION}-SNAPSHOT &&
-    export SNAPSHOT=true ;
-    fi
+  - yarn install
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -60,19 +49,46 @@ cache:
     - '$HOME/Library/Caches/Yarn/'
     - '$HOME/.cache/yarn/'
     - '$HOME/.cache/pip'
-    - '$HOME/.npm'
     - '$HOME/.sonar/cache'
     - './node_modules'
 
 jobs:
   include:
-    - stage: 'Prepare cache'
-      script: true
-
-    - name: 'Lint'
+    - name: 'Get Version'
+      stage: 'Configuration'
+      addons:
+        apt:
+          sources:
+            - deadsnakes
+          packages:
+            - python3.6
+          update: true
+      before_install:
+        - pip install --user awscli
+        - mkdir -p ~/shared
+        - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
       install:
         - nvm install 11
+      script:
+        - export VERSION=$(node -p -e "require('./package.json').version")
+
+        - if [[ "$TRAVIS_BRANCH" == "prod" ]]; then
+          export SNAPSHOT=false;
+          fi
+
+        - if [[ "$TRAVIS_BRANCH" != "prod" ]]; then
+          export VERSION=${VERSION}-SNAPSHOT &&
+          export SNAPSHOT=true ;
+          fi
+
+        - echo ${VERSION} | tee > ~/shared/version
+      after_success:
+        - aws s3 sync ~/shared s3://ionic-travis/$TRAVIS_BUILD_NUMBER
+
+    - name: 'Lint'
       stage: 'Tests'
+      install:
+        - nvm install 11
       script:
         - npm run lint
 
@@ -84,9 +100,12 @@ jobs:
             - deadsnakes
             - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
               key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
+            - sourceline: deb https://dl.yarnpkg.com/debian/ stable main
+              key_url: https://dl.yarnpkg.com/debian/pubkey.gpg
           packages:
             - google-chrome-stable
             - python3.6
+            - yarn
           update: true
       before_install:
         - pip install --user awscli
@@ -138,9 +157,11 @@ jobs:
             - gradle
             - jq
             - python3.6
+            - yarn
           update: true
       script:
-        - npm install -g ionic cordova
+        - yarn install
+        - yarn global add ionic cordova
         - ionic cordova build android --prod --release
         - cp platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk ~/shared/app-release-unsigned.apk
 
@@ -152,7 +173,7 @@ jobs:
       install:
         - ./travis/osx/install.sh
       script:
-        - ionic cordova build ios
+        - ionic cordova build ios --prod --release
 
     - name: 'Package Android'
       stage: 'Package'

@@ -145,22 +145,25 @@ jobs:
 
     - name: 'Build IOS'
       stage: 'Build'
+      os: osx
+      language: objective-c
+      osx_image: xcode10
+      install:
+        - brew update
+        - brew install yarn ios-sim jq ios-deploy cocoapods
+        - brew link --overwrite cocoapods
+        - rvm use system
+        - pod setup
+      script:
+        - nvm install 11
+        - yarn install
+        - yarn global add ionic cordova
+        - ionic cordova build ios
       allow_failures:
         os: osx
         language: objective-c
         osx_image: xcode10
-        install: 
-          - brew update
-          - brew install yarn ios-sim jq ios-deploy cocoapods
-          - brew link --overwrite cocoapods
-          - rvm use system
-          - pod setup 
-        script:
-          - nvm install 11
-          - yarn install
-          - yarn global add ionic cordova
-          - ionic cordova build ios
-      
+
     - name: 'Package Android'
       stage: 'Package'
       android:

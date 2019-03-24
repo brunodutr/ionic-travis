@@ -75,6 +75,9 @@ deploy_s3: &deploy_s3
     secret_access_key: $AWS_SECRET_ACCESS_KEY
     skip_cleanup: true
     acl: public_read
+    local_dir: $S3_LOCAL_DIR
+    upload-dir: $S3_UPLOAD_DIR
+
 
 test: &test
   stage: 'Tests'
@@ -137,10 +140,10 @@ jobs:
         - rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
         - rm -rf $HOME/.gradle/caches/3.5/fileHashes/
         - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
+      before_deploy:
+        - export S3_LOCAL_DIR=platforms/android/app/build/outputs/apk/release
+        - export S3_UPLOAD_DIR=build/$TRAVIS_BUILD_NUMBER
       <<: *deploy_s3
-      deploy:
-        local_dir: platforms/android/app/build/outputs/apk/release
-        upload-dir: build/$TRAVIS_BUILD_NUMBER
 
     - name: 'Build IOS'
       stage: 'Build'
@@ -157,10 +160,9 @@ jobs:
       before_cache: skip
       before_deploy:
         - ./travis/osx/before_deploy.sh
+        - export S3_LOCAL_DIR=s3-cache
+        - export S3_UPLOAD_DIR=osx-cache
       <<: *deploy_s3
-      deploy:
-        local_dir: s3-cache
-        upload-dir: osx-cache
 
     - name: 'Package Android'
       stage: 'Package'
@@ -168,10 +170,10 @@ jobs:
       install: skip
       script:
         - ./travis/sign.sh
+      before_deploy:
+        - export S3_LOCAL_DIR=build
+        - export S3_UPLOAD_DIR=build/$TRAVIS_BUILD_NUMBER
       <<: *deploy_s3
-      deploy:
-        local_dir: build
-        upload-dir: build/$TRAVIS_BUILD_NUMBER
 
     - name: 'Package IOS'
       stage: 'Package'

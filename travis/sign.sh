@@ -23,4 +23,3 @@ sign_apk () {
 mkdir -p build
 mv ~/shared/app-release-unsigned.apk build/app-release-unsigned.apk
 sign_apk app-release-unsigned.apk build
-cp build/app.apk ~/shared/app.apk

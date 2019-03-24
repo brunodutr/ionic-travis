@@ -57,10 +57,12 @@ cache:
   directories:
     - '$HOME/.gradle/caches/'
     - '$HOME/.gradle/wrapper/'
-    - './node_modules'
+    - '$HOME/Library/Caches/Yarn/'
+    - '$HOME/.cache/yarn/'
     - '$HOME/.cache/pip'
     - '$HOME/.npm'
     - '$HOME/.sonar/cache'
+    - './node_modules'
 
 jobs:
   include:
@@ -150,9 +152,6 @@ jobs:
       install:
         - ./travis/osx/install.sh
       script:
-        - nvm install 11
-        - yarn install
-        - yarn global add ionic cordova
         - ionic cordova build ios
 
     - name: 'Package Android'
@@ -176,10 +175,12 @@ jobs:
         - pip install --user awscli
         - mkdir -p ~/shared
         - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
+      install: skip
       after_success:
         - aws s3 sync ~/shared s3://ionic-travis/$TRAVIS_BUILD_NUMBER
       script:
         - ./travis/sign.sh
+        - cp build/app.apk ~/shared/app.apk
 
     - name: 'Package IOS'
       stage: 'Package'

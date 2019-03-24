@@ -150,7 +150,7 @@ jobs:
       osx_image: xcode10
       install: 
         - brew update
-        - brew install yarn ios-sim jq ios-deploy cocoapods
+        - brew install yarn ios-sim jq ios-deploy
         - rvm use system
         - pod setup 
       script:

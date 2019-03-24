@@ -210,18 +210,4 @@ jobs:
       after_success:
         - aws s3 rm --recursive s3://ionic-travis
       script:
-        - mkdir -p coverage
-
-        - mv ~/shared/lcov.info coverage/lcov.info
-
-        - export VERSION=cat ~/shared/version
-        - export SNAPSHOT=cat ~/shared/snapshot
-
-        - echo $VERSION
-        - echo $SNAPSHOT
-        
-        - sonar-scanner -Dsonar.projectVersion=${VERSION}
-          -Dsonar.links.homepage=https://github.com/${TRAVIS_REPO_SLUG}
-          -Dsonar.links.ci=https://travis-ci.com/${TRAVIS_REPO_SLUG}
-          -Dsonar.links.scm=https://github.com/${TRAVIS_REPO_SLUG}
-          -Dsonar.links.issue=https://github.com/${TRAVIS_REPO_SLUG}/issues
+        - ./travis/sonar.sh

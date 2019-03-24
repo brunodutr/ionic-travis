@@ -36,17 +36,16 @@ install:
   - nvm install 11
   - npm install
 
-
 cache:
   - npm
   - pip
   - yarn
   - cocoapods
-  directories:
-    - '$HOME/.gradle/caches/'
-    - '$HOME/.gradle/wrapper/'
-    - '$HOME/.sonar/cache'
-    - '$HOME/Library/Caches/Homebrew'
+  - directories:
+      - '$HOME/.gradle/caches/'
+      - '$HOME/.gradle/wrapper/'
+      - '$HOME/.sonar/cache'
+      - '$HOME/Library/Caches/Homebrew'
 
 jobs:
   include:

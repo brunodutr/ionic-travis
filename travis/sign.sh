@@ -29,13 +29,11 @@ curl -O $URL
 
 if [ -f app-release-unsigned.apk ]; then
     
-    if  [ -s app-release-unsigned.apk ]; then
-        echo 'File was bad or empty'
-        exit 1
-    fi
-
     mkdir -p build
     mv app-release-unsigned.apk build/app-release-unsigned.apk
     sign_apk app-release-unsigned.apk build
+    exit 0
 
 fi
+
+exit 1

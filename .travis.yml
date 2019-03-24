@@ -125,6 +125,7 @@ jobs:
           - android-sdk-preview-.+
           - android-sdk-license-.+
           - google-gdk-license-.+
+      jdk: oraclejdk8
       addons:
         apt:
           sources:
@@ -134,8 +135,6 @@ jobs:
           packages:
             - gradle
             - jq
-            - oracle-java8-installer
-            - oracle-java8-set-default
             - python3.6
           update: true
       script:

@@ -2,7 +2,7 @@ set -e
 
 echo "BRANCH: $TRAVIS_BRANCH | PREPARE DEPLOY"
 
-curl -O ${S3_URL}/build/${$TRAVIS_BUILD_NUMBER}/app.apk
+curl -O ${S3_URL}/build/${TRAVIS_BUILD_NUMBER}/app.apk
 
 ln -s app.apk ionictravis-${VERSION}.apk
 

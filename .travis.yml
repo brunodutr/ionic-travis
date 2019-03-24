@@ -38,15 +38,13 @@ install:
   - npm install
 
 cache:
-  - npm
-  - pip
-  - yarn
-  - cocoapods
   - directories:
       - '$HOME/.gradle/caches/'
       - '$HOME/.gradle/wrapper/'
       - '$HOME/.sonar/cache'
-      - '$HOME/Library/Caches/Homebrew'
+      - '$HOME/.npm'
+      - '$HOME/.cache/yarn'
+      - './node_modules'
 
 android_configuration: &android_configuration
   android:
@@ -187,19 +185,22 @@ jobs:
       install: skip
       if: type != pull_request
       script:
-        - curl -O ${S3_URL}/build/${$TRAVIS_BUILD_NUMBER}/snapshot
+
+        - export URL=${S3_URL}/build/${TRAVIS_BUILD_NUMBER}
+     
+        - curl -O ${URL}/snapshot
+        - curl -O ${URL}/version
 
         - cat snapshot | while read LINE; do
-          export SNAPSHOT=$LINE
-          echo $SNAPSHOT
+            export SNAPSHOT=$LINE
           done
-
-        - curl -O ${S3_URL}/build/${$TRAVIS_BUILD_NUMBER}/version
-
+            
         - cat ~/shared/version | while read LINE; do
-          export VERSION=$LINE
-          echo $VERSION
+            export VERSION=$LINE
           done
+        
+        - echo $SNAPSHOT
+        - echo $VERSION
 
         - ./travis/before_deploy.sh
       deploy:
@@ -230,6 +231,13 @@ jobs:
           organization: 'brunodutr-github'
           token:
             secure: $SONAR_TOKEN
+        apt:
+          sources:
+            - deadsnakes
+          packages:
+            - python3.6
+          update: true
+      <<: *s3
       after_success:
         - aws s3 rm --recursive s3://ionic-travis/build
       script:

@@ -154,6 +154,7 @@ jobs:
         - rvm use system
         - pod setup 
       script:
+        - nvm install 11
         - yarn install
         - yarn global add ionic cordova
         - ionic cordova build ios

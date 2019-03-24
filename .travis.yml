@@ -134,8 +134,6 @@ jobs:
       os: osx
       language: objective-c
       osx_image: xcode10
-      before_install: 
-        - ./travis/osx/before_install.sh
       install:
         - ./travis/osx/install.sh
       script:

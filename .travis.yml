@@ -134,12 +134,26 @@ jobs:
       os: osx
       language: objective-c
       osx_image: xcode10
+      before_install: 
+        - ./travis/osx/before_install.sh
       install:
         - ./travis/osx/install.sh
       script:
         - ionic cordova build ios --prod --release
-      before_cache:
-        - brew cleanup
+      cache: skip
+      before_cache: skip
+      before_deploy:
+        - ./travis/osx/before_deploy.sh
+      deploy:
+        provider: s3
+        bucket: ionic-travis
+        region: $AWS_DEFAULT_REGION
+        access_key_id: $AWS_ACCESS_KEY_ID
+        secret_access_key: $AWS_SECRET_ACCESS_KEY
+        skip_cleanup: true
+        acl: public_read
+        local_dir: s3-cache
+        upload-dir: osx-cache
 
     - name: 'Package Android'
       stage: 'Package'
@@ -193,8 +207,6 @@ jobs:
 
     - name: 'Sonar'
       stage: 'Code Analisys'
-      install:
-        - nvm install 11
       <<: *s3
       addons:
         sonarcloud:

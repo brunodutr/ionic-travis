@@ -47,21 +47,29 @@ cache:
       - '$HOME/.sonar/cache'
       - '$HOME/Library/Caches/Homebrew'
 
+test: &test
+  stage: 'Tests'
+  addons:
+    apt:
+      sources:
+        - deadsnakes
+        - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
+          key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
+      packages:
+        - google-chrome-stable
+        - python3.6
+      update: true
+  before_install:
+    - pip install --user awscli
+    - mkdir -p ~/shared
+    - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
+  after_success:
+    - aws s3 sync ~/shared s3://ionic-travis/$TRAVIS_BUILD_NUMBER
+
 jobs:
   include:
     - name: 'Get Version'
       stage: 'Configuration'
-      addons:
-        apt:
-          sources:
-            - deadsnakes
-          packages:
-            - python3.6
-          update: true
-      before_install:
-        - pip install --user awscli
-        - mkdir -p ~/shared
-        - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
       script:
         - export VERSION=$(node -p -e "require('./package.json').version")
 
@@ -83,38 +91,14 @@ jobs:
       script:
         - npm run lint
 
-    - name: 'Unit Tests'
-      stage: 'Tests'
-      addons:
-        apt:
-          sources:
-            - deadsnakes
-            - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
-              key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
-          packages:
-            - google-chrome-stable
-            - python3.6
-          update: true
-      before_install:
-        - pip install --user awscli
-        - mkdir -p ~/shared
-        - aws s3 sync s3://ionic-travis/$TRAVIS_BUILD_NUMBER ~/shared
-      after_success:
-        - aws s3 sync ~/shared s3://ionic-travis/$TRAVIS_BUILD_NUMBER
+    - <<: *test
+      name: 'Unit Tests'
       script:
         - npm run unit-ci
         - cp coverage/lcov.info ~/shared/lcov.info
 
-    - name: 'e2e Tests'
-      stage: 'Tests'
-      addons:
-        apt:
-          sources:
-            - sourceline: deb http://dl.google.com/linux/chrome/deb/ stable main
-              key_url: https://dl-ssl.google.com/linux/linux_signing_key.pub
-          packages:
-            - google-chrome-stable
-          update: true
+    - <<: *test
+      name: 'e2e Tests'
       script:
         - npm run e2e-ci
 

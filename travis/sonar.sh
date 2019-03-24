@@ -9,8 +9,8 @@ echo "**********************************"
 echo "*        Download Files          *"
 echo "**********************************"
  
-curl -O "${S3_URL}/build/${$TRAVIS_BUILD_NUMBER}/lcov.info"
-curl -O "${S3_URL}/build/${$TRAVIS_BUILD_NUMBER}/version"
+curl -O "${S3_URL}/build/${TRAVIS_BUILD_NUMBER}/lcov.info"
+curl -O "${S3_URL}/build/${TRAVIS_BUILD_NUMBER}/version"
 
 if [ -f version ]; then
     

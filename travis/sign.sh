@@ -22,7 +22,8 @@ sign_apk () {
 
 }
 
-export URL=${S3_URL}/build/${$TRAVIS_BUILD_NUMBER}/app-release-unsigned.apk
+export URL=${S3_URL}/build/${TRAVIS_BUILD_NUMBER}/app-release-unsigned.apk
+
 echo $URL
 curl -O $URL
 

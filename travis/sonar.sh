@@ -12,23 +12,7 @@ echo "**********************************"
 curl -O "${S3_URL}/build/${TRAVIS_BUILD_NUMBER}/lcov.info"
 curl -O "${S3_URL}/build/${TRAVIS_BUILD_NUMBER}/version"
 
-if [ -f version ]; then
-    
-    if  [ -s version ]; then
-        echo 'File was bad or empty'
-        exit 1
-    fi
-
-    echo "*********************************"
-    echo "*        Export Version         *"
-    echo "*********************************"
-
-    cat ~/shared/version | while read LINE; do
-        export VERSION=$LINE
-        echo $VERSION
-    done
-fi
-
+export VERSION=$(cat version)
 
 echo "*********************************"
 echo "*        Sonar Analisys         *"

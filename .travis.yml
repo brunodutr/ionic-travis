@@ -151,11 +151,6 @@ jobs:
         - ./travis/osx/install.sh
       script:
         - ionic cordova build ios --prod --release
-      cache:
-        - edge: true
-        - yarn: true
-        - cocoapods: true
-      before_cache: skip
       before_deploy:
         - ./travis/osx/before_deploy.sh
         - export S3_LOCAL_DIR=s3-cache
@@ -185,24 +180,11 @@ jobs:
       install: skip
       if: type != pull_request
       script:
-
         - export URL=${S3_URL}/build/${TRAVIS_BUILD_NUMBER}
-     
-        - echo $URL
         - curl -O ${URL}/snapshot
         - curl -O ${URL}/version
-
-        - cat snapshot
-        - cat version
-
         - export SNAPSHOT=$(cat snapshot)
-            
         - export VERSION=$(cat version)
-        
-        - echo $SNAPSHOT
-        - echo $VERSION
-        
-
         - ./travis/before_deploy.sh
       deploy:
         provider: releases

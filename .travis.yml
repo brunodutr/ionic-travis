@@ -38,12 +38,11 @@ install:
   - npm install
 
 cache:
+  - npm: true
   - directories:
       - '$HOME/.gradle/caches/'
       - '$HOME/.gradle/wrapper/'
       - '$HOME/.sonar/cache'
-      - '$HOME/.npm'
-      - '$HOME/.cache/yarn'
       - './node_modules'
 
 android_configuration: &android_configuration
@@ -153,8 +152,8 @@ jobs:
       script:
         - ionic cordova build ios --prod --release
       cache:
-        - yarn
-        - cocoapods
+        - yarn: true
+        - cocoapods: true
       before_cache: skip
       before_deploy:
         - ./travis/osx/before_deploy.sh
@@ -196,11 +195,11 @@ jobs:
         - cat version
 
         - cat snapshot | while read LINE; do
-          export SNAPSHOT=$LINE
+          export SNAPSHOT=$LINE;
           done
             
         - cat version | while read LINE; do
-          export VERSION=$LINE
+          export VERSION=$LINE;
           done
         
         - echo $SNAPSHOT

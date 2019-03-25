@@ -192,7 +192,7 @@ jobs:
       script: skip
       before_deploy:
         - curl -O ${S3_URL}/build/${TRAVIS_BUILD_NUMBER}/www.tar.gz
-        - tar xvfz file.tar.gz -C ./
+        - tar xvfz www.tar.gz -C ./
       deploy:
         provider: pages
         skip-cleanup: true

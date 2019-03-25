@@ -152,6 +152,7 @@ jobs:
       script:
         - ionic cordova build ios --prod --release
       cache:
+        - edge: true
         - yarn: true
         - cocoapods: true
       before_cache: skip
@@ -195,10 +196,12 @@ jobs:
         - cat version
 
         - cat snapshot | while read LINE; do
+          echo $LINE &&
           export SNAPSHOT=$LINE;
           done
             
         - cat version | while read LINE; do
+          echo $LINE &&
           export VERSION=$LINE;
           done
         

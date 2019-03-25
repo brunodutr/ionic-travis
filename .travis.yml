@@ -122,7 +122,7 @@ jobs:
       script:
         - npm run build-prod
       before_deploy:
-        - tar czf www.tar.gz -C www/
+        - tar cvzf www.tar.gz www/
         - mkdir -pv build-web
         - mv -v www.tar.gz build-web
         - export S3_LOCAL_DIR=build-web

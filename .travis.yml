@@ -188,19 +188,24 @@ jobs:
 
         - export URL=${S3_URL}/build/${TRAVIS_BUILD_NUMBER}
      
+        - echo $URL
         - curl -O ${URL}/snapshot
         - curl -O ${URL}/version
 
+        - cat snapshot
+        - cat version
+
         - cat snapshot | while read LINE; do
-            export SNAPSHOT=$LINE
+          export SNAPSHOT=$LINE
           done
             
-        - cat ~/shared/version | while read LINE; do
-            export VERSION=$LINE
+        - cat version | while read LINE; do
+          export VERSION=$LINE
           done
         
         - echo $SNAPSHOT
         - echo $VERSION
+        
 
         - ./travis/before_deploy.sh
       deploy:

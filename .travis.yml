@@ -120,11 +120,8 @@ jobs:
     - name: 'Build Web'
       stage: 'Build'
       script:
-        - npm run build-prod
+        - ./travis/web/install.sh
       before_deploy:
-        - tar cvzf www.tar.gz www/
-        - mkdir -pv build-web
-        - mv -v www.tar.gz build-web
         - export S3_LOCAL_DIR=build-web
         - export S3_UPLOAD_DIR=build/$TRAVIS_BUILD_NUMBER
       <<: *deploy_s3
@@ -189,6 +186,23 @@ jobs:
         - echo "Package IOS"
 
     - stage: 'Deploy'
+      name: 'Deploy Github Pages'
+      install: skip
+      if: type != pull_request
+      script: skip
+      before_deploy:
+        - ./travis/web/before_deploy.sh
+      deploy:
+        provider: pages
+        skip-cleanup: true
+        github-token: $GITHUB_TOKEN
+        keep-history: true
+        local-dir: www
+        on:
+          all_branches: true
+
+    - stage: 'Deploy'
+      name: 'Deploy Releases'
       install: skip
       if: type != pull_request
       script:
@@ -197,6 +211,7 @@ jobs:
         - curl -O ${URL}/version
         - export SNAPSHOT=$(cat snapshot)
         - export VERSION=$(cat version)
+      before_deploy:
         - ./travis/before_deploy.sh
       deploy:
         provider: releases

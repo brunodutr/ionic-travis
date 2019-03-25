@@ -39,11 +39,13 @@ install:
 
 cache:
   - npm: true
+  - yarn: true
+  - cocoapods: true
   - directories:
-      - '$HOME/.gradle/caches/'
-      - '$HOME/.gradle/wrapper/'
-      - '$HOME/.sonar/cache'
-      - './node_modules'
+      - $HOME/.gradle/caches/
+      - $HOME/.gradle/wrapper/
+      - $HOME/.sonar/cache
+      - node_modules
 
 android_configuration: &android_configuration
   android:

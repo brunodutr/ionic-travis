@@ -195,15 +195,9 @@ jobs:
         - cat snapshot
         - cat version
 
-        - cat snapshot | while read LINE; do
-          echo $LINE &&
-          export SNAPSHOT=$LINE;
-          done
+        - export SNAPSHOT=$(cat snapshot)
             
-        - cat version | while read LINE; do
-          echo $LINE &&
-          export VERSION=$LINE;
-          done
+        - export VERSION=$(cat version)
         
         - echo $SNAPSHOT
         - echo $VERSION

@@ -75,7 +75,6 @@ deploy_s3: &deploy_s3
     local_dir: $S3_LOCAL_DIR
     upload-dir: $S3_UPLOAD_DIR
 
-
 test: &test
   stage: 'Tests'
   addons:
@@ -92,7 +91,6 @@ test: &test
 
 jobs:
   include:
-
     - <<: *test
       name: 'Get Version'
       stage: 'Configuration'
@@ -116,6 +114,18 @@ jobs:
         - npm run e2e-ci
       before_install: skip
       after_success: skip
+
+    - name: 'Build Web'
+      stage: 'Build'
+      script:
+        - npm run build-prod
+      before_deploy:
+        - tar czf www.tar.gz -C www
+        - mkdir -pv build-web
+        - mv -v www.tar.gz build-web
+        - export S3_LOCAL_DIR=build-web
+        - export S3_UPLOAD_DIR=build/$TRAVIS_BUILD_NUMBER
+      <<: *deploy_s3
 
     - name: 'Build Android'
       stage: 'Build'

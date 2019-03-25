@@ -191,7 +191,8 @@ jobs:
       if: type != pull_request
       script: skip
       before_deploy:
-        - ./travis/web/before_deploy.sh
+        - curl -O ${S3_URL}/build/${TRAVIS_BUILD_NUMBER}/www.tar.gz
+        - tar xzf www.tar.gz -C www
       deploy:
         provider: pages
         skip-cleanup: true

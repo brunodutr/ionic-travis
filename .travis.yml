@@ -46,7 +46,6 @@ cache:
       - $HOME/.gradle/wrapper/
       - $HOME/.sonar/cache
       - node_modules
-      - $HOME/osx_npm/node_modules
 
 android_configuration: &android_configuration
   android:
@@ -140,6 +139,7 @@ jobs:
             - jq
           update: true
       script:
+        - npm rebuild node-sass
         - npm i -g ionic cordova
         - ionic cordova build android --prod --release
       before_cache:

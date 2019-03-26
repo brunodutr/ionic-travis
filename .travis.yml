@@ -46,6 +46,7 @@ cache:
       - $HOME/.gradle/wrapper/
       - $HOME/.sonar/cache
       - node_modules
+      - $HOME/osx_npm/node_modules
 
 android_configuration: &android_configuration
   android:

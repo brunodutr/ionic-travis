@@ -25,7 +25,7 @@ if [ -f homebrew-cache.tar.gz ]; then
 fi
 
 rvm use system
-pod setup
+# pod setup
 
 npm install
 npm rebuild node-sass

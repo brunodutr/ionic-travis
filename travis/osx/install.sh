@@ -27,6 +27,6 @@ fi
 rvm use system
 pod setup
 
-export NODE_PATH=$HOME/osx_npm/node_modules
 npm install
+npm rebuild node-sass
 npm install -g ionic cordova

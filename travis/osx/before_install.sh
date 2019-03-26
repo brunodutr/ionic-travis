@@ -15,6 +15,6 @@ if [ -f homebrew-cache.tar.gz ]; then
   tar xzf homebrew-cache.tar.gz -C /usr/local/Cellar
 
   echo 'Linking dependencies...'
-  brew link yarn ios-sim jq ios-deploy
+  brew link node ios-sim jq ios-deploy
   brew link --overwrite cocoapods
 fi

@@ -45,8 +45,6 @@ cache:
       - $HOME/.gradle/caches/
       - $HOME/.gradle/wrapper/
       - $HOME/.sonar/cache
-      - $HOME/Library/Caches/Yarn
-      - $HOME/.cache/yarn
       - node_modules
 
 android_configuration: &android_configuration

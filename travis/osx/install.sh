@@ -11,18 +11,18 @@ if [ -f homebrew-cache.tar.gz ]; then
     echo 'Installing dependencies...'
     brew update
     brew install cocoapods || brew link --overwrite cocoapods
-    brew install yarn ios-sim jq ios-deploy  
+    brew install node ios-sim jq ios-deploy  
   fi
 
   echo 'Extracting dependencies...'
   tar xzf homebrew-cache.tar.gz -C /usr/local/Cellar
 
   echo 'Linking dependencies...'
-  brew link yarn ios-sim jq ios-deploy
+  brew link node ios-sim jq ios-deploy
   brew link --overwrite cocoapods
 fi
 
 rvm use system
 pod setup
-yarn install
-yarn global add ionic cordova
+npm install
+npm install -g ionic cordova

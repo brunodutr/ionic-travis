@@ -93,16 +93,19 @@ test: &test
 
 jobs:
   include:
+  
     - <<: *test
       name: 'Get Version'
       stage: 'Configuration'
       script:
         - ./travis/config/version.sh
 
+
     - name: 'Lint'
       stage: 'Tests'
       script:
         - npm run lint
+
 
     - <<: *test
       name: 'Unit Tests'
@@ -110,12 +113,14 @@ jobs:
         - npm run unit-ci
         - cp coverage/lcov.info ~/shared/lcov.info
 
+
     - <<: *test
       name: 'e2e Tests'
       script:
         - npm run e2e-ci
       before_install: skip
       after_success: skip
+
 
     - name: 'Build Web'
       stage: 'Build'
@@ -125,6 +130,7 @@ jobs:
         - export S3_LOCAL_DIR=build-web
         - export S3_UPLOAD_DIR=build/$TRAVIS_BUILD_NUMBER
       <<: *deploy_s3
+
 
     - name: 'Build Android'
       stage: 'Build'
@@ -137,7 +143,6 @@ jobs:
           packages:
             - gradle
             - jq
-          update: true
       script:
         - npm rebuild node-sass
         - npm i -g ionic cordova
@@ -151,6 +156,7 @@ jobs:
         - export S3_LOCAL_DIR=platforms/android/app/build/outputs/apk/release
         - export S3_UPLOAD_DIR=build/$TRAVIS_BUILD_NUMBER
       <<: *deploy_s3
+
 
     - name: 'Build IOS'
       stage: 'Build'
@@ -166,6 +172,7 @@ jobs:
         - export S3_LOCAL_DIR=s3-cache
         - export S3_UPLOAD_DIR=osx-cache
       <<: *deploy_s3
+
 
     - name: 'Package Android'
       stage: 'Package'
@@ -248,7 +255,6 @@ jobs:
             - deadsnakes
           packages:
             - python3.6
-          update: true
       <<: *s3
       after_success:
         - aws s3 rm --recursive s3://ionic-travis/build
